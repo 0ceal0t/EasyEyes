@@ -48,7 +48,7 @@ namespace EasyEyes.UI
             ImGui.BeginTabBar( "MainInterfaceTabs" );
             _Vfx.Draw();
             _Log.Draw();
-            _Settings.Draw();
+            //_Settings.Draw(); // DONT NEED THIS YET
             ImGui.EndTabBar();
 
             ImGui.End();

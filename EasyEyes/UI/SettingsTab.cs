@@ -22,12 +22,6 @@ namespace EasyEyes.UI {
             var Id = "##Settings";
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
-            ImGui.InputText( "Dummy VFX" + Id, ref DummyInput, 255 );
-            ImGui.SameLine();
-            if( ImGui.SmallButton( "Update" ) ) {
-                _plugin.Configuration.DUMMY_VFX = DummyInput;
-            }
-
             if( ImGui.Button( "Save" ) ) {
                 _plugin.Configuration.Save();
             }

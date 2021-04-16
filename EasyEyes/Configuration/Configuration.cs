@@ -21,7 +21,6 @@ namespace EasyEyes {
     public class Configuration : IPluginConfiguration {
         public int Version { get; set; } = 0;
         public List<SavedItem> Items = new List<SavedItem>();
-        public string DUMMY_VFX = "vfx/common/eff/cmma_shoot1c.avfx";
 
         [NonSerialized]
         private DalamudPluginInterface _pluginInterface;
