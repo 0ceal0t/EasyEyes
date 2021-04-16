@@ -20,6 +20,8 @@ namespace EasyEyes {
 
         public string PluginDebugTitleStr;
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
+        public string FileLocation;
+        public static readonly string DUMMY_VFX = "vfx/common/eff/cmma_shoot1c.avfx";
 
         public void Initialize( DalamudPluginInterface pluginInterface ) {
             PluginInterface = pluginInterface;
@@ -28,10 +30,10 @@ namespace EasyEyes {
             Configuration.Initialize( PluginInterface );
             ResourceLoader = new ResourceLoader( this );
             PluginInterface.CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) {
-                HelpMessage = "/easy - toggle ui"
+                HelpMessage = "toggle ui"
             } );
 
-            PluginDebugTitleStr = $"{Name} - Debug Build";
+            FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "default_vfx.avfx" );
 
             ResourceLoader.Init();
             ResourceLoader.Enable();
@@ -54,20 +56,15 @@ namespace EasyEyes {
 
         public struct RecordedItem {
             public string path;
-            public bool removed;
-
-            //public override int GetHashCode() => ( path ).GetHashCode();
-            //public override bool Equals( object obj ) => obj is RecordedItem other && this.Equals( other );
-            //public bool Equals( RecordedItem p ) => path == p.path;
         }
+
         public List<RecordedItem> Recorded = new List<RecordedItem>();
         public bool DoRecord = false;
-        public void Record(string path, bool removed ) {
+        public void AddRecord( string path ) {
             if( !DoRecord ) return;
 
             var item = new RecordedItem {
-                path = path,
-                removed = removed
+                path = path
             };
             Recorded.Add( item );
         }

@@ -21,6 +21,7 @@ namespace EasyEyes {
     public class Configuration : IPluginConfiguration {
         public int Version { get; set; } = 0;
         public List<SavedItem> Items = new List<SavedItem>();
+        public bool IgnoreSelf = false;
 
         [NonSerialized]
         private DalamudPluginInterface _pluginInterface;
