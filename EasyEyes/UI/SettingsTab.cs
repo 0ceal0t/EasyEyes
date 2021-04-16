@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 namespace EasyEyes.UI {
     public class SettingsTab {
         public Plugin _plugin;
+        public string DummyInput;
 
         public SettingsTab( Plugin plugin ) {
             _plugin = plugin;
+            DummyInput = _plugin.Configuration.DUMMY_VFX;
         }
 
         public void Draw() {
@@ -20,7 +22,11 @@ namespace EasyEyes.UI {
             var Id = "##Settings";
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
-            ImGui.Checkbox( "Allow own VFxs" + Id, ref _plugin.Configuration.IgnoreSelf );
+            ImGui.InputText( "Dummy VFX" + Id, ref DummyInput, 255 );
+            ImGui.SameLine();
+            if( ImGui.SmallButton( "Update" ) ) {
+                _plugin.Configuration.DUMMY_VFX = DummyInput;
+            }
 
             if( ImGui.Button( "Save" ) ) {
                 _plugin.Configuration.Save();

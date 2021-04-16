@@ -21,7 +21,7 @@ namespace EasyEyes {
         public string PluginDebugTitleStr;
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string FileLocation;
-        public static readonly string DUMMY_VFX = "vfx/common/eff/cmma_shoot1c.avfx";
+        public string DUMMY_VFX => Configuration.DUMMY_VFX;
 
         public void Initialize( DalamudPluginInterface pluginInterface ) {
             PluginInterface = pluginInterface;
@@ -33,7 +33,7 @@ namespace EasyEyes {
                 HelpMessage = "toggle ui"
             } );
 
-            FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "default_vfx.avfx" );
+            FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "does_not_exist.avfx" );
 
             ResourceLoader.Init();
             ResourceLoader.Enable();

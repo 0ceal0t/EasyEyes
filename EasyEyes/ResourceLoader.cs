@@ -117,7 +117,7 @@ namespace EasyEyes {
 
         private unsafe IntPtr StaticVfxNewHandler( char* path, char* pool ) {
             if( Process( path ) ) {
-                var p = Encoding.ASCII.GetBytes( Plugin.DUMMY_VFX );
+                var p = Encoding.ASCII.GetBytes( _plugin.DUMMY_VFX );
                 var bPath = stackalloc byte[p.Length + 1];
                 Marshal.Copy( p, 0, new IntPtr( bPath ), p.Length );
                 return StaticVfxNewHook.OriginalFunction( (char*) bPath, pool );
@@ -132,8 +132,9 @@ namespace EasyEyes {
         }
 
         private unsafe IntPtr ActorVfxNewHandler( char* a1, IntPtr a2, IntPtr a3, float a4, char a5, UInt16 a6, char a7 ) {
-            if( Process( a1 ) && ( !_plugin.Configuration.IgnoreSelf || _plugin.PluginInterface.ClientState?.LocalPlayer?.Address != a2 ) ) {
-                var p = Encoding.ASCII.GetBytes( Plugin.DUMMY_VFX );
+            var gameFsPath = Marshal.PtrToStringAnsi( new IntPtr( a1 ) );
+            if( Process( a1 ) ) {
+                var p = Encoding.ASCII.GetBytes( _plugin.DUMMY_VFX );
                 var bPath = stackalloc byte[p.Length + 1];
                 Marshal.Copy( p, 0, new IntPtr( bPath ), p.Length );
                 return ActorVfxNewHook.OriginalFunction( ( char* )bPath, a2, a3, a4, a5, a6, a7 );
@@ -241,7 +242,7 @@ namespace EasyEyes {
 
             // ============ REPLACE THE FILE ============
             FileInfo replaceFile = null;
-            if(gameFsPath == Plugin.DUMMY_VFX ) {
+            if(gameFsPath == _plugin.DUMMY_VFX ) {
                 replaceFile = new FileInfo( _plugin.FileLocation );
             }
 

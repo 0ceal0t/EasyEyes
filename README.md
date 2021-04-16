@@ -15,6 +15,7 @@ Add the VFX path you want to hide in the "Blacklist" tab. this can be done by:
 
 ## TODO
 - [ ] Whitelist
+- [ ] Allow own VFXs
 - [ ] VFX selector from VFXEditor?
 - [ ] Blacklist a type
 - [ ] Blacklist an NPC
