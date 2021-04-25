@@ -8,11 +8,9 @@ using System.Threading.Tasks;
 namespace EasyEyes.UI {
     public class SettingsTab {
         public Plugin _plugin;
-        public string DummyInput;
 
         public SettingsTab( Plugin plugin ) {
             _plugin = plugin;
-            DummyInput = _plugin.Configuration.DUMMY_VFX;
         }
 
         public void Draw() {

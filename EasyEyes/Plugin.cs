@@ -21,7 +21,6 @@ namespace EasyEyes {
         public string PluginDebugTitleStr;
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string FileLocation;
-        public string DUMMY_VFX => Configuration.DUMMY_VFX;
 
         public void Initialize( DalamudPluginInterface pluginInterface ) {
             PluginInterface = pluginInterface;
