@@ -66,6 +66,7 @@
     <ItemGroup>
         <PackageReference Include="ILRepack" Version="2.1.0-beta1" />
         <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.2" />
+        <PackageReference Include="mgholam.fastCSV" Version="2.0.9" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="Reloaded.Hooks" Version="2.4.1" />
     </ItemGroup>
@@ -73,6 +74,9 @@
     <ItemGroup>
       <None Update="EasyEyes.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Files\npc.csv">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
@@ -84,7 +88,11 @@
       <NativeLibs Remove="EasyEyes.json" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Files\" />
+    </ItemGroup>
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="mkdir $(TargetDir)Output&#xD;&#xA;xcopy /Y $(TargetDir)FASM*.dll $(TargetDir)Output&#xD;&#xA;xcopy /Y $(TargetDir)EasyEyes.json $(TargetDir)Output" />
+      <Exec Command="mkdir $(TargetDir)Output&#xD;&#xA;mkdir $(TargetDir)Output\Files&#xD;&#xA;xcopy /E  /Y /R &quot;$(TargetDir)Files&quot; &quot;$(TargetDir)Output\Files&quot;&#xD;&#xA;xcopy /Y $(TargetDir)FASM*.dll $(TargetDir)Output&#xD;&#xA;xcopy /Y $(TargetDir)EasyEyes.json $(TargetDir)Output" />
     </Target>
 </Project>

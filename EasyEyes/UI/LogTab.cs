@@ -11,7 +11,6 @@ using static EasyEyes.Plugin;
 namespace EasyEyes.UI {
     public class LogTab {
         public Plugin _plugin;
-        public BaseVfx SpawnVfx = null;
 
         public LogTab(Plugin plugin ) {
             _plugin = plugin;
@@ -48,30 +47,7 @@ namespace EasyEyes.UI {
             }
             if( disabled ) ImGui.PopStyleVar();
             // ======== SPAWN / REMOVE =========
-            if( SpawnVfx == null ) {
-                if( disabled ) ImGui.PushStyleVar( ImGuiStyleVar.Alpha, ImGui.GetStyle().Alpha * 0.5f );
-                ImGui.SameLine();
-                if( ImGui.Button( "Spawn" + Id ) && !disabled ) {
-                    ImGui.OpenPopup( "Spawn_Popup" );
-                }
-                if( disabled ) ImGui.PopStyleVar();
-            }
-            else {
-                ImGui.SameLine();
-                if( ImGui.Button( "Remove" + Id ) ) {
-                    SpawnVfx?.Remove();
-                    SpawnVfx = null;
-                }
-            }
-            if( ImGui.BeginPopup( "Spawn_Popup" ) ) {
-                if( ImGui.Selectable( "On Ground" ) ) {
-                    SpawnVfx = new StaticVfx( _plugin, SelectedLogPath, _plugin.PluginInterface.ClientState.LocalPlayer.Position );
-                }
-                if( ImGui.Selectable( "On Self" ) ) {
-                    SpawnVfx = new ActorVfx( _plugin, _plugin.PluginInterface.ClientState.LocalPlayer, _plugin.PluginInterface.ClientState.LocalPlayer, SelectedLogPath );
-                }
-                ImGui.EndPopup();
-            }
+            _plugin.MainUI.DrawSpawnButton( "Spawn", Id, SelectedLogPath, disabled );
 
             //=======================
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, -1), true );

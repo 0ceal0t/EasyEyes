@@ -10,6 +10,7 @@ using Dalamud.Interface;
 using Dalamud.Plugin;
 using EasyEyes.Structs.Vfx;
 using ImGuiNET;
+using VFXSelect.UI;
 
 namespace EasyEyes.UI
 {
@@ -21,17 +22,16 @@ namespace EasyEyes.UI
         public LogTab _Log;
         public VfxTab _Vfx;
         public SettingsTab _Settings;
-
-        public BaseVfx SpawnVfx {
-            get { return _Log.SpawnVfx; }
-            set { _Log.SpawnVfx = value; }
-        }
+        public VFXSelectDialog SelectUI;
 
         public MainInterface( Plugin plugin )  {
             _plugin = plugin;
             _Log = new LogTab( plugin );
             _Vfx = new VfxTab( plugin );
             _Settings = new SettingsTab( plugin );
+            SelectUI = new VFXSelectDialog( _plugin._Sheets, "File Select", _plugin.Configuration.RecentSelects );
+            SelectUI.OnSelect += _plugin.AddVfx;
+            SelectUI.OnAddRecent += _plugin.Configuration.AddRecent;
 
 #if DEBUG
             Visible = true;
@@ -41,6 +41,8 @@ namespace EasyEyes.UI
         public void Draw() {
             if( !Visible ) return;
 
+            SelectUI.Draw();
+
             ImGui.SetNextWindowSize( new Vector2( 400, 500 ), ImGuiCond.FirstUseEver );
             var ret = ImGui.Begin( _plugin.Name, ref Visible );
             if( !ret ) return;
@@ -48,7 +50,6 @@ namespace EasyEyes.UI
             ImGui.BeginTabBar( "MainInterfaceTabs" );
             _Vfx.Draw();
             _Log.Draw();
-            //_Settings.Draw(); // DONT NEED THIS YET
             ImGui.EndTabBar();
 
             ImGui.End();
@@ -88,6 +89,33 @@ namespace EasyEyes.UI
             }
             ImGui.PopStyleColor();
             return ret;
+        }
+
+        public void DrawSpawnButton(string text, string Id, string path, bool disabled) {
+            if( _plugin.SpawnVfx == null ) {
+                if( disabled ) ImGui.PushStyleVar( ImGuiStyleVar.Alpha, ImGui.GetStyle().Alpha * 0.5f );
+                ImGui.SameLine();
+                if( ImGui.Button( text + Id ) && !disabled ) {
+                    ImGui.OpenPopup( "Spawn_Popup" );
+                }
+                if( disabled ) ImGui.PopStyleVar();
+            }
+            else {
+                ImGui.SameLine();
+                if( ImGui.Button( "Remove" + Id ) ) {
+                    _plugin.SpawnVfx?.Remove();
+                    _plugin.SpawnVfx = null;
+                }
+            }
+            if( ImGui.BeginPopup( "Spawn_Popup" ) ) {
+                if( ImGui.Selectable( "On Ground" ) ) {
+                    _plugin.SpawnVfx = new StaticVfx( _plugin, path, _plugin.PluginInterface.ClientState.LocalPlayer.Position );
+                }
+                if( ImGui.Selectable( "On Self" ) ) {
+                    _plugin.SpawnVfx = new ActorVfx( _plugin, _plugin.PluginInterface.ClientState.LocalPlayer, _plugin.PluginInterface.ClientState.LocalPlayer, path );
+                }
+                ImGui.EndPopup();
+            }
         }
     }
 }

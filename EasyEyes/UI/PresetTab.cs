@@ -6,18 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace EasyEyes.UI {
-    public class PresetTab {
+    public class SettingsTab {
         public Plugin _plugin;
 
-        public PresetTab( Plugin plugin ) {
+        public SettingsTab( Plugin plugin ) {
             _plugin = plugin;
         }
 
         public void Draw() {
-            var ret = ImGui.BeginTabItem( "Presets##MainInterfaceTabs" );
+            var ret = ImGui.BeginTabItem( "Settings##MainInterfaceTabs" );
             if( !ret ) return;
 
-            var Id = "##Preset";
+            var Id = "##Settings";
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
             if( ImGui.Button( "Save" ) ) {

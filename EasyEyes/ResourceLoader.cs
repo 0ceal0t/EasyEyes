@@ -121,8 +121,8 @@ namespace EasyEyes {
             return StaticVfxNewHook.OriginalFunction( path, pool );
         }
         private unsafe IntPtr StaticVfxRemoveHandler( IntPtr vfx ) {
-            if( _plugin.MainUI?.SpawnVfx != null && vfx == _plugin.MainUI.SpawnVfx.Vfx ) {
-                _plugin.MainUI.SpawnVfx = null;
+            if( _plugin?.SpawnVfx != null && vfx == _plugin.SpawnVfx.Vfx ) {
+                _plugin.SpawnVfx = null;
             }
             return StaticVfxRemoveHook.OriginalFunction( vfx );
         }
@@ -133,8 +133,8 @@ namespace EasyEyes {
             return ActorVfxNewHook.OriginalFunction( a1, a2, a3, a4, a5, a6, a7 );
         }
         private unsafe IntPtr ActorVfxRemoveHandler( IntPtr vfx, char a2 ) {
-            if( _plugin.MainUI?.SpawnVfx != null && vfx == _plugin.MainUI.SpawnVfx.Vfx ) {
-                _plugin.MainUI.SpawnVfx = null;
+            if( _plugin?.SpawnVfx != null && vfx == _plugin.SpawnVfx.Vfx ) {
+                _plugin.SpawnVfx = null;
             }
             return ActorVfxRemoveHook.OriginalFunction( vfx, a2 );
         }

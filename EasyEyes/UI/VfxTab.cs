@@ -1,3 +1,4 @@
+using Dalamud.Interface;
 using Dalamud.Plugin;
 using EasyEyes.Util;
 using ImGuiNET;
@@ -37,6 +38,13 @@ namespace EasyEyes.UI {
                 }
                 AddVfxPath = "";
             }
+            ImGui.SameLine();
+            ImGui.PushFont( UiBuilder.IconFont );
+            if( ImGui.Button( $"{( char )FontAwesomeIcon.Search}", new Vector2( 30, 23 ) ) ) {
+                _plugin.MainUI.SelectUI.Show(showLocal: false);
+            }
+            ImGui.PopFont();
+
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, ImGui.GetContentRegionAvail().Y - 22), true );
@@ -72,6 +80,10 @@ namespace EasyEyes.UI {
                     ImGui.SetClipboardText( SelectedVfx.AVFXPath );
                 }
                 ImGui.Checkbox( "Disabled" + Id, ref SelectedVfx.Disabled );
+
+                ImGui.SameLine();
+                _plugin.MainUI.DrawSpawnButton( "Spawn", Id, SelectedVfx.AVFXPath, SelectedVfx.Disabled );
+
                 ImGui.Text( "Notes:" );
                 ImGui.InputTextMultiline( Id + "-Description", ref SelectedVfx.Notes, 400, new Vector2( ImGui.GetContentRegionAvail().X, 200 ) );
                 if( ImGui.Button( "Save" + Id ) ) {
@@ -98,8 +110,10 @@ namespace EasyEyes.UI {
                 var result = await picker.ShowDialogAsync();
                 if( result == DialogResult.OK ) {
                     try {
-                        var paths = _plugin.Configuration.Items.ConvertAll( x => x.AVFXPath ).ToArray();
-                        File.WriteAllLines( picker.FileName, paths );
+                        if(_plugin.Configuration.Items.Count > 0 ) {
+                            var paths = _plugin.Configuration.Items.ConvertAll( x => x.AVFXPath ).ToArray();
+                            File.WriteAllLines( picker.FileName, paths );
+                        }
                     }
                     catch( Exception ex ) {
                         PluginLog.LogError( ex, "Could not select a file" );

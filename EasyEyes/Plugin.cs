@@ -6,6 +6,9 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using System.Reflection;
 using EasyEyes.UI;
+using EasyEyes.Structs.Vfx;
+using VFXSelect;
+using VFXSelect.UI;
 
 namespace EasyEyes {
     public class Plugin : IDalamudPlugin {
@@ -17,6 +20,8 @@ namespace EasyEyes {
         public ResourceLoader ResourceLoader;
 
         public MainInterface MainUI;
+        public BaseVfx SpawnVfx = null;
+        public SheetManager _Sheets;
 
         public string PluginDebugTitleStr;
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
@@ -33,6 +38,8 @@ namespace EasyEyes {
             } );
 
             FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "does_not_exist.avfx" );
+
+            _Sheets = new SheetManager( PluginInterface, Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "npc.csv" ) );
 
             ResourceLoader.Init();
             ResourceLoader.Enable();
@@ -55,6 +62,10 @@ namespace EasyEyes {
 
         public struct RecordedItem {
             public string path;
+        }
+
+        public void AddVfx(VFXSelectResult result ) {
+            Configuration.AddPath( result.Path, out var newItem );
         }
 
         public List<RecordedItem> Recorded = new List<RecordedItem>();
