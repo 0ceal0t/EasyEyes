@@ -29,9 +29,8 @@ namespace EasyEyes.UI
             _Log = new LogTab( plugin );
             _Vfx = new VfxTab( plugin );
             _Settings = new SettingsTab( plugin );
-            SelectUI = new VFXSelectDialog( _plugin._Sheets, "File Select", _plugin.Configuration.RecentSelects );
+            SelectUI = new VFXSelectDialog( _plugin._Sheets, "File Select", null );
             SelectUI.OnSelect += _plugin.AddVfx;
-            SelectUI.OnAddRecent += _plugin.Configuration.AddRecent;
 
 #if DEBUG
             Visible = true;
