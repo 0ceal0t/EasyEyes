@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using VFXSelect.UI;
 using static EasyEyes.Plugin;
 
 namespace EasyEyes.UI {
@@ -53,7 +54,7 @@ namespace EasyEyes.UI {
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, -1), true );
             List<RecordedItem> items = _plugin.Recorded; // TODO: filtering
             if( items.Count > 0 ) {
-                MainInterface.DisplayVisible( items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
+                VFXSelectDialog.DisplayVisible( items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
                 ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
                 int idx = 0;
                 foreach( var item in items ) {

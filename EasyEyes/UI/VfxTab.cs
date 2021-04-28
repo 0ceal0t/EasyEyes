@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VFXSelect.UI;
 
 namespace EasyEyes.UI {
     public class VfxTab {
@@ -48,7 +49,7 @@ namespace EasyEyes.UI {
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, ImGui.GetContentRegionAvail().Y - 22), true );
-            MainInterface.DisplayVisible( _plugin.Configuration.Items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
+            VFXSelectDialog.DisplayVisible( _plugin.Configuration.Items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
             int idx = 0;
             foreach( var item in _plugin.Configuration.Items ) {

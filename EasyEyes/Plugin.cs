@@ -40,10 +40,11 @@ namespace EasyEyes {
             FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "does_not_exist.avfx" );
 
             _Sheets = new SheetManager( PluginInterface, Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "npc.csv" ) );
+            MainUI = new MainInterface( this );
 
             ResourceLoader.Init();
             ResourceLoader.Enable();
-            MainUI = new MainInterface( this );
+
             PluginInterface.UiBuilder.OnBuildUi += MainUI.Draw;
         }
 

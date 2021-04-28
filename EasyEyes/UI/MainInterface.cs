@@ -28,7 +28,7 @@ namespace EasyEyes.UI
             _plugin = plugin;
             _Log = new LogTab( plugin );
             _Vfx = new VfxTab( plugin );
-            _Settings = new SettingsTab( plugin );
+
             SelectUI = new VFXSelectDialog( _plugin._Sheets, "File Select", null );
             SelectUI.OnSelect += _plugin.AddVfx;
 
@@ -42,6 +42,7 @@ namespace EasyEyes.UI
 
             SelectUI.Draw();
 
+            // =================
             ImGui.SetNextWindowSize( new Vector2( 400, 500 ), ImGuiCond.FirstUseEver );
             var ret = ImGui.Begin( _plugin.Name, ref Visible );
             if( !ret ) return;
@@ -55,16 +56,6 @@ namespace EasyEyes.UI
         }
 
         public void Dispose() {
-        }
-
-        public static void DisplayVisible( int count, out int preItems, out int showItems, out int postItems, out float itemHeight ) {
-            float childHeight = ImGui.GetContentRegionAvail().Y;
-            var scrollY = ImGui.GetScrollY();
-            var style = ImGui.GetStyle();
-            itemHeight = ImGui.GetTextLineHeight() + style.ItemSpacing.Y;
-            preItems = ( int )Math.Floor( scrollY / itemHeight );
-            showItems = ( int )Math.Ceiling( childHeight / itemHeight );
-            postItems = count - showItems - preItems;
         }
 
         public static bool OkButton( string label, bool small = false ) {
