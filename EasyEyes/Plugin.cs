@@ -51,10 +51,11 @@ namespace EasyEyes {
         public void Dispose() {
             PluginInterface.UiBuilder.OnBuildUi -= MainUI.Draw;
 
+            ResourceLoader?.Dispose();
+
             PluginInterface.CommandManager.RemoveHandler( CommandName );
             PluginInterface?.Dispose();
             MainUI?.Dispose();
-            ResourceLoader?.Dispose();
         }
 
         private void OnCommand( string command, string rawArgs ) {
