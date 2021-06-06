@@ -16,12 +16,12 @@ namespace EasyEyes {
         private const string CommandName = "/easy";
 
         public DalamudPluginInterface PluginInterface;
-        public Configuration Configuration;
+        public Configuration Config;
         public ResourceLoader ResourceLoader;
 
         public MainInterface MainUI;
         public BaseVfx SpawnVfx = null;
-        public SheetManager _Sheets;
+        public SheetManager Sheets;
 
         public string PluginDebugTitleStr;
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
@@ -30,8 +30,8 @@ namespace EasyEyes {
         public void Initialize( DalamudPluginInterface pluginInterface ) {
             PluginInterface = pluginInterface;
 
-            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Initialize( PluginInterface );
+            Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Config.Initialize( PluginInterface );
             ResourceLoader = new ResourceLoader( this );
             PluginInterface.CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) {
                 HelpMessage = "toggle ui"
@@ -39,7 +39,7 @@ namespace EasyEyes {
 
             FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "does_not_exist.avfx" );
 
-            _Sheets = new SheetManager( PluginInterface, Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "npc.csv" ) );
+            Sheets = new SheetManager( PluginInterface, Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "npc.csv" ) );
             MainUI = new MainInterface( this );
 
             ResourceLoader.Init();
@@ -67,7 +67,7 @@ namespace EasyEyes {
         }
 
         public void AddVfx(VFXSelectResult result ) {
-            Configuration.AddPath( result.Path, out var newItem );
+            Config.AddPath( result.Path, out var newItem );
         }
 
         public List<RecordedItem> Recorded = new List<RecordedItem>();

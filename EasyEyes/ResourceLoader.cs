@@ -14,7 +14,7 @@ using EasyEyes.Structs;
 namespace EasyEyes {
     public class ResourceLoader : IDisposable
     {
-        public Plugin _plugin { get; set; }
+        public Plugin Plugin { get; set; }
         public bool IsEnabled { get; set; }
         public Crc32 Crc32 { get; }
 
@@ -76,12 +76,12 @@ namespace EasyEyes {
 
 
         public ResourceLoader( Plugin plugin ) {
-            _plugin = plugin;
+            Plugin = plugin;
             Crc32 = new Crc32();
         }
 
         public unsafe void Init() {
-            var scanner = _plugin.PluginInterface.TargetModuleScanner;
+            var scanner = Plugin.PluginInterface.TargetModuleScanner;
 
             // https://github.com/0ceal0t/Dalamud-VFXEditor/blob/main/VFXEditor/ResourceLoader.cs
 
@@ -117,24 +117,24 @@ namespace EasyEyes {
 
         private unsafe IntPtr StaticVfxNewHandler( char* path, char* pool ) {
             var gameFsPath = Marshal.PtrToStringAnsi( new IntPtr( path ) );
-            _plugin.AddRecord( gameFsPath );
+            Plugin.AddRecord( gameFsPath );
             return StaticVfxNewHook.OriginalFunction( path, pool );
         }
         private unsafe IntPtr StaticVfxRemoveHandler( IntPtr vfx ) {
-            if( _plugin.SpawnVfx != null && vfx == _plugin.SpawnVfx.Vfx ) {
-                _plugin.SpawnVfx = null;
+            if( Plugin.SpawnVfx != null && vfx == Plugin.SpawnVfx.Vfx ) {
+                Plugin.SpawnVfx = null;
             }
             return StaticVfxRemoveHook.OriginalFunction( vfx );
         }
 
         private unsafe IntPtr ActorVfxNewHandler( char* a1, IntPtr a2, IntPtr a3, float a4, char a5, UInt16 a6, char a7 ) {
             var gameFsPath = Marshal.PtrToStringAnsi( new IntPtr( a1 ) );
-            _plugin.AddRecord( gameFsPath );
+            Plugin.AddRecord( gameFsPath );
             return ActorVfxNewHook.OriginalFunction( a1, a2, a3, a4, a5, a6, a7 );
         }
         private unsafe IntPtr ActorVfxRemoveHandler( IntPtr vfx, char a2 ) {
-            if( _plugin.SpawnVfx != null && vfx == _plugin.SpawnVfx.Vfx ) {
-                _plugin.SpawnVfx = null;
+            if( Plugin.SpawnVfx != null && vfx == Plugin.SpawnVfx.Vfx ) {
+                Plugin.SpawnVfx = null;
             }
             return ActorVfxRemoveHook.OriginalFunction( vfx, a2 );
         }
@@ -224,8 +224,8 @@ namespace EasyEyes {
 
             // ============ REPLACE THE FILE ============
             FileInfo replaceFile = null;
-            if(_plugin?.Configuration != null && _plugin.Configuration.IsDisabled( gameFsPath )) {
-                replaceFile = new FileInfo( _plugin.FileLocation );
+            if( Plugin?.Config != null && Plugin.Config.IsDisabled( gameFsPath )) {
+                replaceFile = new FileInfo( Plugin.FileLocation );
             }
 
             var fsPath = replaceFile?.FullName;

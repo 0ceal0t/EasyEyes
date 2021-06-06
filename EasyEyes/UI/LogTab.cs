@@ -11,10 +11,10 @@ using static EasyEyes.Plugin;
 
 namespace EasyEyes.UI {
     public class LogTab {
-        public Plugin _plugin;
+        public Plugin Plugin;
 
         public LogTab(Plugin plugin ) {
-            _plugin = plugin;
+            Plugin = plugin;
         }
 
         public string SelectedLogPath = "";
@@ -24,19 +24,19 @@ namespace EasyEyes.UI {
 
             var Id = "##Log";
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
-            if( _plugin.DoRecord ) {
+            if( Plugin.DoRecord ) {
                 if(MainInterface.RemoveButton("Stop" + Id ) ) {
-                    _plugin.DoRecord = false;
+                    Plugin.DoRecord = false;
                 }
             }
             else {
                 if(MainInterface.OkButton("Record" + Id ) ) {
-                    _plugin.DoRecord = true;
+                    Plugin.DoRecord = true;
                 }
             }
             ImGui.SameLine();
             if( ImGui.Button( "Reset" + Id ) ) {
-                _plugin.ClearRecord();
+                Plugin.ClearRecord();
                 SelectedLogPath = "";
             }
             var disabled = string.IsNullOrEmpty( SelectedLogPath );
@@ -44,15 +44,15 @@ namespace EasyEyes.UI {
             if( disabled ) ImGui.PushStyleVar( ImGuiStyleVar.Alpha, ImGui.GetStyle().Alpha * 0.5f );
             ImGui.SameLine();
             if( ImGui.Button( "Add To Blacklist" + Id ) && !disabled ) {
-                _plugin.Configuration.AddPath( SelectedLogPath, out var newItem );
+                Plugin.Config.AddPath( SelectedLogPath, out var newItem );
             }
             if( disabled ) ImGui.PopStyleVar();
             // ======== SPAWN / REMOVE =========
-            _plugin.MainUI.DrawSpawnButton( "Spawn", Id, SelectedLogPath, disabled );
+            Plugin.MainUI.DrawSpawnButton( "Spawn", Id, SelectedLogPath, disabled );
 
             //=======================
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, -1), true );
-            List<RecordedItem> items = _plugin.Recorded; // TODO: filtering
+            List<RecordedItem> items = Plugin.Recorded; // TODO: filtering
             if( items.Count > 0 ) {
                 VFXSelectDialog.DisplayVisible( items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
                 ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );

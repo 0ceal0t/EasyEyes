@@ -13,8 +13,8 @@ namespace EasyEyes {
         public string Notes = "";
         public bool Disabled = true;
 
-        public SavedItem(string _path ) {
-            AVFXPath = _path;
+        public SavedItem(string path ) {
+            AVFXPath = path;
         }
     }
 

@@ -15,26 +15,57 @@ using VFXSelect.UI;
 namespace EasyEyes.UI
 {
     public class MainInterface {
-        private readonly Plugin _plugin;
+        private readonly Plugin Plugin;
         public bool Visible = false;
         public bool ShowDebugBar = false;
 
-        public LogTab _Log;
-        public VfxTab _Vfx;
-        public SettingsTab _Settings;
+        public LogTab Log;
+        public VfxTab Vfx;
         public VFXSelectDialog SelectUI;
 
         public MainInterface( Plugin plugin )  {
-            _plugin = plugin;
-            _Log = new LogTab( plugin );
-            _Vfx = new VfxTab( plugin );
+            Plugin = plugin;
+            Log = new LogTab( plugin );
+            Vfx = new VfxTab( plugin );
 
-            SelectUI = new VFXSelectDialog( _plugin._Sheets, "File Select", null );
-            SelectUI.OnSelect += _plugin.AddVfx;
+            SelectUI = new VFXSelectDialog(
+                Plugin.Sheets, "File Select", null,
+                showSpawn: true,
+                spawnVfxExists: () => SpawnExists(),
+                removeSpawnVfx: () => RemoveSpawnVfx(),
+                spawnOnGround: ( string path ) => SpawnOnGround( path ),
+                spawnOnSelf: ( string path ) => SpawnOnSelf( path ),
+                spawnOnTarget: ( string path ) => SpawnOnTarget( path )
+            );
+            SelectUI.OnSelect += Plugin.AddVfx;
 
 #if DEBUG
             Visible = true;
 #endif
+        }
+
+        public bool SpawnExists() {
+            return Plugin.SpawnVfx != null;
+        }
+
+        public void RemoveSpawnVfx() {
+            Plugin.SpawnVfx?.Remove();
+            Plugin.SpawnVfx = null;
+        }
+
+        public void SpawnOnGround( string path ) {
+            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Plugin.PluginInterface.ClientState.LocalPlayer.Position );
+        }
+
+        public void SpawnOnSelf( string path ) {
+            Plugin.SpawnVfx = new ActorVfx( Plugin, Plugin.PluginInterface.ClientState.LocalPlayer, Plugin.PluginInterface.ClientState.LocalPlayer, path );
+        }
+
+        public void SpawnOnTarget( string path ) {
+            var t = Plugin.PluginInterface.ClientState.Targets.CurrentTarget;
+            if( t != null ) {
+                Plugin.SpawnVfx = new ActorVfx( Plugin, t, t, path );
+            }
         }
 
         public void Draw() {
@@ -44,12 +75,12 @@ namespace EasyEyes.UI
 
             // =================
             ImGui.SetNextWindowSize( new Vector2( 400, 500 ), ImGuiCond.FirstUseEver );
-            var ret = ImGui.Begin( _plugin.Name, ref Visible );
+            var ret = ImGui.Begin( Plugin.Name, ref Visible );
             if( !ret ) return;
 
             ImGui.BeginTabBar( "MainInterfaceTabs" );
-            _Vfx.Draw();
-            _Log.Draw();
+            Vfx.Draw();
+            Log.Draw();
             ImGui.EndTabBar();
 
             ImGui.End();
@@ -82,7 +113,7 @@ namespace EasyEyes.UI
         }
 
         public void DrawSpawnButton(string text, string Id, string path, bool disabled) {
-            if( _plugin.SpawnVfx == null ) {
+            if( Plugin.SpawnVfx == null ) {
                 if( disabled ) ImGui.PushStyleVar( ImGuiStyleVar.Alpha, ImGui.GetStyle().Alpha * 0.5f );
                 ImGui.SameLine();
                 if( ImGui.Button( text + Id ) && !disabled ) {
@@ -93,16 +124,15 @@ namespace EasyEyes.UI
             else {
                 ImGui.SameLine();
                 if( ImGui.Button( "Remove" + Id ) ) {
-                    _plugin.SpawnVfx?.Remove();
-                    _plugin.SpawnVfx = null;
+                    RemoveSpawnVfx();
                 }
             }
             if( ImGui.BeginPopup( "Spawn_Popup" ) ) {
                 if( ImGui.Selectable( "On Ground" ) ) {
-                    _plugin.SpawnVfx = new StaticVfx( _plugin, path, _plugin.PluginInterface.ClientState.LocalPlayer.Position );
+                    SpawnOnGround( path );
                 }
                 if( ImGui.Selectable( "On Self" ) ) {
-                    _plugin.SpawnVfx = new ActorVfx( _plugin, _plugin.PluginInterface.ClientState.LocalPlayer, _plugin.PluginInterface.ClientState.LocalPlayer, path );
+                    SpawnOnSelf( path );
                 }
                 ImGui.EndPopup();
             }

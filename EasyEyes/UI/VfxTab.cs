@@ -14,10 +14,10 @@ using VFXSelect.UI;
 
 namespace EasyEyes.UI {
     public class VfxTab {
-        public Plugin _plugin;
+        public Plugin Plugin;
 
         public VfxTab( Plugin plugin ) {
-            _plugin = plugin;
+            Plugin = plugin;
         }
 
         public SavedItem SelectedVfx = null;
@@ -33,8 +33,8 @@ namespace EasyEyes.UI {
             ImGui.InputText( Id + "-Path", ref AddVfxPath, 255 );
             ImGui.SameLine();
             if( ImGui.Button( "Add Path" + Id ) ) {
-                if( _plugin.PluginInterface.Data.FileExists( AddVfxPath ) ) {
-                    _plugin.Configuration.AddPath( AddVfxPath, out var newItem );
+                if( Plugin.PluginInterface.Data.FileExists( AddVfxPath ) ) {
+                    Plugin.Config.AddPath( AddVfxPath, out var newItem );
                     SelectedVfx = newItem;
                 }
                 AddVfxPath = "";
@@ -42,17 +42,17 @@ namespace EasyEyes.UI {
             ImGui.SameLine();
             ImGui.PushFont( UiBuilder.IconFont );
             if( ImGui.Button( $"{( char )FontAwesomeIcon.Search}", new Vector2( 30, 23 ) ) ) {
-                _plugin.MainUI.SelectUI.Show(showLocal: false);
+                Plugin.MainUI.SelectUI.Show(showLocal: false);
             }
             ImGui.PopFont();
 
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, ImGui.GetContentRegionAvail().Y - 22), true );
-            VFXSelectDialog.DisplayVisible( _plugin.Configuration.Items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
+            VFXSelectDialog.DisplayVisible( Plugin.Config.Items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
             int idx = 0;
-            foreach( var item in _plugin.Configuration.Items ) {
+            foreach( var item in Plugin.Config.Items ) {
                 if( idx < preItems || idx > ( preItems + showItems ) ) { idx++; continue; }
                 if( ImGui.Selectable( item.AVFXPath + Id + idx, SelectedVfx == item ) ) {
                     SelectedVfx = item;
@@ -83,16 +83,16 @@ namespace EasyEyes.UI {
                 ImGui.Checkbox( "Disabled" + Id, ref SelectedVfx.Disabled );
 
                 ImGui.SameLine();
-                _plugin.MainUI.DrawSpawnButton( "Spawn", Id, SelectedVfx.AVFXPath, SelectedVfx.Disabled );
+                Plugin.MainUI.DrawSpawnButton( "Spawn", Id, SelectedVfx.AVFXPath, SelectedVfx.Disabled );
 
                 ImGui.Text( "Notes:" );
                 ImGui.InputTextMultiline( Id + "-Description", ref SelectedVfx.Notes, 400, new Vector2( ImGui.GetContentRegionAvail().X, 200 ) );
                 if( ImGui.Button( "Save" + Id ) ) {
-                    _plugin.Configuration.Save();
+                    Plugin.Config.Save();
                 }
                 ImGui.SameLine();
                 if( MainInterface.RemoveButton( "Delete" ) ) {
-                    _plugin.Configuration.RemoveItem( SelectedVfx );
+                    Plugin.Config.RemoveItem( SelectedVfx );
                     SelectedVfx = null;
                 }
             }
@@ -111,8 +111,8 @@ namespace EasyEyes.UI {
                 var result = await picker.ShowDialogAsync();
                 if( result == DialogResult.OK ) {
                     try {
-                        if(_plugin.Configuration.Items.Count > 0 ) {
-                            var paths = _plugin.Configuration.Items.ConvertAll( x => x.AVFXPath ).ToArray();
+                        if( Plugin.Config.Items.Count > 0 ) {
+                            var paths = Plugin.Config.Items.ConvertAll( x => x.AVFXPath ).ToArray();
                             File.WriteAllLines( picker.FileName, paths );
                         }
                     }
@@ -136,7 +136,7 @@ namespace EasyEyes.UI {
                         var paths = File.ReadAllLines( picker.FileName );
                         foreach(var path in paths ) {
                             if( !string.IsNullOrEmpty( path ) ) {
-                                _plugin.Configuration.AddPath( path, out var newItem );
+                                Plugin.Config.AddPath( path, out var newItem );
                             }
                         }
                     }
