@@ -1,10 +1,8 @@
 using System.Runtime.InteropServices;
 
-namespace EasyEyes.Structs
-{
+namespace EasyEyes.Structs {
     [StructLayout( LayoutKind.Explicit )]
-    public unsafe struct SeFileDescriptor
-    {
+    public unsafe struct SeFileDescriptor {
         [FieldOffset( 0x00 )]
         public FileMode FileMode;
 

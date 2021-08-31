@@ -1,22 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
-using Dalamud.Plugin;
 using ImGuiNET;
 using VFXSelect.Data.Rows;
 
-namespace VFXSelect.UI
-{
+namespace VFXSelect.UI {
     public class VFXHousingSelect : VFXSelectTab<XivHousing, XivHousingSelected> {
-        public VFXHousingSelect( string parentId, string tabId, SheetManager sheet, VFXSelectDialog dialog ) : 
-            base(parentId, tabId, sheet.Housing, sheet.PluginInterface, dialog) {
+        private ImGuiScene.TextureWrap Icon;
+
+        public VFXHousingSelect( string parentId, string tabId, VFXSelectDialog dialog ) :
+            base( parentId, tabId, SheetManager.Housing, dialog ) {
         }
 
-        ImGuiScene.TextureWrap Icon;
         public override void OnSelect() {
             LoadIcon( Selected.Icon, ref Icon );
         }
@@ -36,19 +29,19 @@ namespace VFXSelect.UI
 
             ImGui.Text( "SGB Path: " );
             ImGui.SameLine();
-            Dialog.DisplayPath( loadedItem.Housing.sgbPath );
+            VFXSelectDialog.DisplayPath( loadedItem.Housing.sgbPath );
 
-            int vfxIdx = 0;
-            foreach( var _vfx in loadedItem.VfxPaths ) {
+            var vfxIdx = 0;
+            foreach( var path in loadedItem.VfxPaths ) {
                 ImGui.Text( "VFX #" + vfxIdx + ": " );
                 ImGui.SameLine();
-                Dialog.DisplayPath( _vfx );
+                VFXSelectDialog.DisplayPath( path );
                 if( ImGui.Button( "SELECT" + Id + vfxIdx ) ) {
-                    Dialog.Invoke( new VFXSelectResult( VFXSelectType.GameItem, "[HOUSING] " + loadedItem.Housing.Name + " #" + vfxIdx, _vfx ) );
+                    Dialog.Invoke( new VFXSelectResult( VFXSelectType.GameItem, "[HOUSING] " + loadedItem.Housing.Name + " #" + vfxIdx, path ) );
                 }
                 ImGui.SameLine();
-                Dialog.Copy( _vfx, id: Id + "Copy" + vfxIdx );
-                Dialog.Spawn( _vfx, id: Id + "Spawn" + vfxIdx );
+                VFXSelectDialog.Copy( path, id: Id + "Copy" + vfxIdx );
+                Dialog.Spawn( path, id: Id + "Spawn" + vfxIdx );
                 vfxIdx++;
             }
         }

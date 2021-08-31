@@ -1,46 +1,83 @@
-using Dalamud.Game.ClientState.Actors.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Dalamud.Game;
+using Dalamud.Game.ClientState.Objects.Types;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EasyEyes.Structs.Vfx {
-    public abstract class BaseVfx {
-        public Plugin _Plugin;
-        public IntPtr Vfx;
+
+    /*
+        *(undefined4 *)(vfx + 0x50) = DAT_01bb2850;
+        *(undefined4 *)(vfx + 0x54) = DAT_01bb2854;
+        *(undefined4 *)(vfx + 0x58) = DAT_01bb2858;
+        uVar3 = uRam0000000001bb286c;
+        uVar2 = uRam0000000001bb2868;
+        uVar5 = uRam0000000001bb2864;
+        *(undefined4 *)(vfx + 0x60) = _ZERO_VECTOR;
+        *(undefined4 *)(vfx + 100) = uVar5;
+        *(undefined4 *)(vfx + 0x68) = uVar2;
+        *(undefined4 *)(vfx + 0x6c) = uVar3;
+        *(undefined4 *)(vfx + 0x70) = DAT_01bb2870;
+        *(undefined4 *)(vfx + 0x74) = DAT_01bb2874;
+        uVar5 = DAT_01bb2878;
+        *(undefined4 *)(vfx + 0x78) = DAT_01bb2878;
+        *(ulonglong *)(vfx + 0x38) = *(ulonglong *)(vfx + 0x38) | 2;
+        * + 0x43 for the color (targeting vfx)
+        * vfxColor = vfx + 0x45
+        * 
+     */
+
+
+    [StructLayout( LayoutKind.Explicit )]
+    public unsafe struct VfxStruct {
+        [FieldOffset( 0x38 )] public byte Flags;
+        [FieldOffset( 0x50 )] public Vector3 Position;
+        [FieldOffset( 0x70 )] public Vector3 Scale;
+
+        [FieldOffset( 0x128 )] public int ActorCaster;
+        [FieldOffset( 0x130 )] public int ActorTarget;
+
+        [FieldOffset( 0x1B8 )] public int StaticCaster;
+        [FieldOffset( 0x1C0 )] public int StaticTarget;
+    }
+
+    public abstract unsafe class BaseVfx {
+        public Plugin Plugin;
+        public VfxStruct* Vfx;
         public string Path;
 
-        public BaseVfx( Plugin plugin, string path) {
-            _Plugin = plugin;
+        public BaseVfx( Plugin plugin, string path ) {
+            Plugin = plugin;
             Path = path;
         }
 
         public abstract void Remove();
 
         public void Update() {
-            if( Vfx == IntPtr.Zero ) return;
-            var flagAddr = IntPtr.Add( Vfx, 0x38 );
-            byte currentFlag = Marshal.ReadByte( flagAddr );
-            currentFlag |= 0x2;
-            Marshal.WriteByte( flagAddr, currentFlag );
+            if( Vfx == null ) return;
+            Vfx->Flags |= 0x2;
         }
 
         public void UpdatePosition( Vector3 position ) {
-            if( Vfx == IntPtr.Zero ) return;
-            IntPtr addr = IntPtr.Add( Vfx, 0x50 );
-            var x = BitConverter.GetBytes( position.X );
-            var y = BitConverter.GetBytes( position.Y );
-            var z = BitConverter.GetBytes( position.Z );
-            Marshal.Copy( x, 0, addr, 4 );
-            Marshal.Copy( z, 0, addr + 0x4, 4 );
-            Marshal.Copy( y, 0, addr + 0x8, 4 );
+            if( Vfx == null ) return;
+            Vfx->Position = new Vector3 {
+                X = position.X,
+                Y = position.Y,
+                Z = position.Z
+            };
         }
 
-        public void UpdatePosition( Actor actor ) {
-            UpdatePosition( new Vector3( actor.Position.X, actor.Position.Y, actor.Position.Z ) );
+        public void UpdatePosition( GameObject actor ) {
+            if( Vfx == null ) return;
+            Vfx->Position = actor.Position;
+        }
+
+        public void UpdateScale( Vector3 scale ) {
+            if( Vfx == null ) return;
+            Vfx->Scale = new Vector3 {
+                X = scale.X,
+                Y = scale.Y,
+                Z = scale.Z
+            };
         }
     }
 }

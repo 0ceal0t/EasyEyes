@@ -1,59 +1,100 @@
 using System;
+
 using System.Collections.Generic;
 using System.IO;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
-using ImGuiNET;
+
 using System.Reflection;
+
 using EasyEyes.UI;
 using EasyEyes.Structs.Vfx;
+
 using VFXSelect;
 using VFXSelect.UI;
+
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game;
+using Dalamud.Data;
 
 namespace EasyEyes {
     public class Plugin : IDalamudPlugin {
         public string Name => "EasyEyes";
         private const string CommandName = "/easy";
 
-        public DalamudPluginInterface PluginInterface;
+        public static DalamudPluginInterface PluginInterface { get; private set; }
+        public static ClientState ClientState { get; private set; }
+        public static CommandManager CommandManager { get; private set; }
+        public static SigScanner SigScanner { get; private set; }
+        public static DataManager DataManager { get; private set; }
+        public static TargetManager TargetManager { get; private set; }
+
+        public static ResourceLoader ResourceLoader { get; private set; }
+
+        public BaseVfx SpawnVfx = null;
         public Configuration Config;
-        public ResourceLoader ResourceLoader;
 
         public MainInterface MainUI;
-        public BaseVfx SpawnVfx = null;
-        public SheetManager Sheets;
 
         public string PluginDebugTitleStr;
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string FileLocation;
 
-        public void Initialize( DalamudPluginInterface pluginInterface ) {
+        public Plugin(
+                DalamudPluginInterface pluginInterface,
+                ClientState clientState,
+                CommandManager commandManager,
+                SigScanner sigScanner,
+                DataManager dataManager,
+                TargetManager targetManager
+            ) {
             PluginInterface = pluginInterface;
+            ClientState = clientState;
+            CommandManager = commandManager;
+            SigScanner = sigScanner;
+            DataManager = dataManager;
+            TargetManager = targetManager;
 
             Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Config.Initialize( PluginInterface );
+
             ResourceLoader = new ResourceLoader( this );
-            PluginInterface.CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) {
+
+            CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) {
                 HelpMessage = "toggle ui"
             } );
 
             FileLocation = Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "does_not_exist.avfx" );
 
-            Sheets = new SheetManager( PluginInterface, Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "npc.csv" ) );
+            SheetManager.Initialize(
+                Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "npc.csv" ),
+                Path.Combine( Path.GetDirectoryName( AssemblyLocation ), "Files", "monster_vfx.json" ),
+                DataManager,
+                PluginInterface
+            );
+
             MainUI = new MainInterface( this );
 
             ResourceLoader.Init();
             ResourceLoader.Enable();
 
-            PluginInterface.UiBuilder.OnBuildUi += MainUI.Draw;
+            PluginInterface.UiBuilder.Draw += MainUI.Draw;
+        }
+
+        public void ClearSpawnVfx() {
+            SpawnVfx = null;
         }
 
         public void Dispose() {
-            PluginInterface.UiBuilder.OnBuildUi -= MainUI.Draw;
+            PluginInterface.UiBuilder.Draw -= MainUI.Draw;
 
             ResourceLoader?.Dispose();
 
-            PluginInterface.CommandManager.RemoveHandler( CommandName );
+            SpawnVfx?.Remove();
+            SpawnVfx = null;
+
+            CommandManager.RemoveHandler( CommandName );
             PluginInterface?.Dispose();
             MainUI?.Dispose();
         }
@@ -66,11 +107,11 @@ namespace EasyEyes {
             public string path;
         }
 
-        public void AddVfx(VFXSelectResult result ) {
-            Config.AddPath( result.Path, out var newItem );
+        public void AddVfx( VFXSelectResult result ) {
+            Config.AddPath( result.Path, out var _ );
         }
 
-        public List<RecordedItem> Recorded = new List<RecordedItem>();
+        public List<RecordedItem> Recorded = new();
         public bool DoRecord = false;
         public void AddRecord( string path ) {
             if( !DoRecord ) return;

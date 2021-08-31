@@ -1,4 +1,5 @@
 using Dalamud.Interface;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 using EasyEyes.Util;
 using ImGuiNET;
@@ -33,7 +34,7 @@ namespace EasyEyes.UI {
             ImGui.InputText( Id + "-Path", ref AddVfxPath, 255 );
             ImGui.SameLine();
             if( ImGui.Button( "Add Path" + Id ) ) {
-                if( Plugin.PluginInterface.Data.FileExists( AddVfxPath ) ) {
+                if( Plugin.DataManager.FileExists( AddVfxPath ) ) {
                     Plugin.Config.AddPath( AddVfxPath, out var newItem );
                     SelectedVfx = newItem;
                 }
@@ -49,9 +50,9 @@ namespace EasyEyes.UI {
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, ImGui.GetContentRegionAvail().Y - 22), true );
-            VFXSelectDialog.DisplayVisible( Plugin.Config.Items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
+            VFXSelectDialog.DisplayVisible( Plugin.Config.Items.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
-            int idx = 0;
+            var idx = 0;
             foreach( var item in Plugin.Config.Items ) {
                 if( idx < preItems || idx > ( preItems + showItems ) ) { idx++; continue; }
                 if( ImGui.Selectable( item.AVFXPath + Id + idx, SelectedVfx == item ) ) {

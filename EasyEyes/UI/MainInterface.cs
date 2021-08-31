@@ -1,13 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using Dalamud.Interface;
-using Dalamud.Plugin;
 using EasyEyes.Structs.Vfx;
 using ImGuiNET;
 using VFXSelect.UI;
@@ -29,7 +20,8 @@ namespace EasyEyes.UI
             Vfx = new VfxTab( plugin );
 
             SelectUI = new VFXSelectDialog(
-                Plugin.Sheets, "File Select", null,
+                "File Select",
+                null,
                 showSpawn: true,
                 spawnVfxExists: () => SpawnExists(),
                 removeSpawnVfx: () => RemoveSpawnVfx(),
@@ -38,10 +30,6 @@ namespace EasyEyes.UI
                 spawnOnTarget: ( string path ) => SpawnOnTarget( path )
             );
             SelectUI.OnSelect += Plugin.AddVfx;
-
-#if DEBUG
-            Visible = true;
-#endif
         }
 
         public bool SpawnExists() {
@@ -54,15 +42,15 @@ namespace EasyEyes.UI
         }
 
         public void SpawnOnGround( string path ) {
-            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Plugin.PluginInterface.ClientState.LocalPlayer.Position );
+            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Plugin.ClientState.LocalPlayer.Position );
         }
 
         public void SpawnOnSelf( string path ) {
-            Plugin.SpawnVfx = new ActorVfx( Plugin, Plugin.PluginInterface.ClientState.LocalPlayer, Plugin.PluginInterface.ClientState.LocalPlayer, path );
+            Plugin.SpawnVfx = new ActorVfx( Plugin, Plugin.ClientState.LocalPlayer, Plugin.ClientState.LocalPlayer, path );
         }
 
         public void SpawnOnTarget( string path ) {
-            var t = Plugin.PluginInterface.ClientState.Targets.CurrentTarget;
+            var t = Plugin.TargetManager.Target;
             if( t != null ) {
                 Plugin.SpawnVfx = new ActorVfx( Plugin, t, t, path );
             }
@@ -96,7 +84,7 @@ namespace EasyEyes.UI
             return ColoredButton( label, new Vector4( 0.80f, 0.10f, 0.10f, 1.0f ), small );
         }
         public static bool ColoredButton( string label, Vector4 color, bool small) {
-            bool ret = false;
+            var ret = false;
             ImGui.PushStyleColor( ImGuiCol.Button, color );
             if( small ) {
                 if( ImGui.SmallButton( label ) ) {

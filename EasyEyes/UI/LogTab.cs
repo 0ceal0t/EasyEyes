@@ -52,11 +52,11 @@ namespace EasyEyes.UI {
 
             //=======================
             ImGui.BeginChild( Id + "Tree", new Vector2(-1, -1), true );
-            List<RecordedItem> items = Plugin.Recorded; // TODO: filtering
+            var items = Plugin.Recorded; // TODO: filtering
             if( items.Count > 0 ) {
-                VFXSelectDialog.DisplayVisible( items.Count, out int preItems, out int showItems, out int postItems, out float itemHeight );
+                VFXSelectDialog.DisplayVisible( items.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
                 ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
-                int idx = 0;
+                var idx = 0;
                 foreach( var item in items ) {
                     if( idx < preItems || idx > ( preItems + showItems ) ) { idx++; continue; }
                     if( ImGui.Selectable( item.path + Id + idx, SelectedLogPath == item.path ) ) {
