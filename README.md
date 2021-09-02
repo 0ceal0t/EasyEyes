@@ -2,6 +2,8 @@
 
 A QuickLauncher plugin which can hide VFXs which are too bright or distracting.
 
+Icon by [PAPACHIN](https://www.xivmodarchive.com/user/192152)
+
 ## Installation
 1. This plugin requires [XIV Quick Launcher](https://github.com/goatcorp/FFXIVQuickLauncher) to run
 2. Enable the plugins from the `/xlplugins` menu
