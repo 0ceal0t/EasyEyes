@@ -95,7 +95,6 @@ namespace EasyEyes {
             SpawnVfx = null;
 
             CommandManager.RemoveHandler( CommandName );
-            PluginInterface?.Dispose();
             MainUI?.Dispose();
         }
 
