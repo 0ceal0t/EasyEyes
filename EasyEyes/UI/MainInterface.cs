@@ -59,9 +59,9 @@ namespace EasyEyes.UI
         public void Draw() {
             if( !Visible ) return;
 
+            Plugin.DialogManager.Draw();
             SelectUI.Draw();
 
-            // =================
             ImGui.SetNextWindowSize( new Vector2( 400, 500 ), ImGuiCond.FirstUseEver );
             var ret = ImGui.Begin( Plugin.Name, ref Visible );
             if( !ret ) return;

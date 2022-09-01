@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0-windows7.0": {
+      "DalamudPackager": {
+        "type": "Direct",
+        "requested": "[2.1.7, )",
+        "resolved": "2.1.7",
+        "contentHash": "jnZ/sdInyn07ycuWI+pPOtP/xE3v+c4+jYJfDt36FWnBF9NKqkpzfviJtPl/jGLgbaCmFIXu+Yid0N8GvdKefg=="
+      },
+      "mgholam.fastCSV": {
+        "type": "Direct",
+        "requested": "[2.0.9, )",
+        "resolved": "2.0.9",
+        "contentHash": "AOFqanoVebasDk/X1qm7X9/q/UwTz6/fpNFfqsEh6K1euTV9CxknPIhlLpo6CHlhiyMUs1/vv+g+KE8C8VYGcg=="
+      }
+    }
+  }
+}

@@ -1,16 +1,9 @@
 using Dalamud.Interface;
 using Dalamud.Logging;
-using Dalamud.Plugin;
-using EasyEyes.Util;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using VFXSelect.UI;
 
 namespace EasyEyes.UI {
@@ -102,19 +95,12 @@ namespace EasyEyes.UI {
         }
 
         public void ExportDialog() {
-            Task.Run( async () => {
-                var picker = new SaveFileDialog {
-                    Filter = "Text File (*.txt)|*.txt*|All files (*.*)|*.*",
-                    Title = "Select a Save Location.",
-                    DefaultExt = "txt",
-                    AddExtension = true
-                };
-                var result = await picker.ShowDialogAsync();
-                if( result == DialogResult.OK ) {
+            Plugin.DialogManager.SaveFileDialog( "Select a Save Location", ".txt,.*", "exported_vfx", "txt", ( bool ok, string res ) => {
+                if ( ok ) {
                     try {
                         if( Plugin.Config.Items.Count > 0 ) {
                             var paths = Plugin.Config.Items.ConvertAll( x => x.AVFXPath ).ToArray();
-                            File.WriteAllLines( picker.FileName, paths );
+                            File.WriteAllLines( res, paths );
                         }
                     }
                     catch( Exception ex ) {
@@ -125,17 +111,11 @@ namespace EasyEyes.UI {
         }
 
         public void ImportDialog() {
-            Task.Run( async () => {
-                var picker = new OpenFileDialog {
-                    Filter = "Text File (*.txt)|*.txt*|All files (*.*)|*.*",
-                    Title = "Select a File Location.",
-                    CheckFileExists = true
-                };
-                var result = await picker.ShowDialogAsync();
-                if( result == DialogResult.OK ) {
+            Plugin.DialogManager.OpenFileDialog( "Select a File Location", ".txt,.*", ( bool ok, string res ) => {
+                if( ok ) {
                     try {
-                        var paths = File.ReadAllLines( picker.FileName );
-                        foreach(var path in paths ) {
+                        var paths = File.ReadAllLines( res );
+                        foreach( var path in paths ) {
                             if( !string.IsNullOrEmpty( path ) ) {
                                 Plugin.Config.AddPath( path, out var newItem );
                             }

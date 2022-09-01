@@ -1,22 +1,18 @@
 using System;
-
 using System.Collections.Generic;
 using System.IO;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
-
 using System.Reflection;
-
 using EasyEyes.UI;
 using EasyEyes.Structs.Vfx;
-
 using VFXSelect;
 using VFXSelect.UI;
-
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game;
 using Dalamud.Data;
+using Dalamud.Interface.ImGuiFileDialog;
 
 namespace EasyEyes {
     public class Plugin : IDalamudPlugin {
@@ -29,12 +25,12 @@ namespace EasyEyes {
         public static SigScanner SigScanner { get; private set; }
         public static DataManager DataManager { get; private set; }
         public static TargetManager TargetManager { get; private set; }
+        public static FileDialogManager DialogManager { get; private set; }
 
         public static ResourceLoader ResourceLoader { get; private set; }
 
         public BaseVfx SpawnVfx = null;
         public Configuration Config;
-
         public MainInterface MainUI;
 
         public string PluginDebugTitleStr;
@@ -55,6 +51,7 @@ namespace EasyEyes {
             SigScanner = sigScanner;
             DataManager = dataManager;
             TargetManager = targetManager;
+            DialogManager = new();
 
             Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Config.Initialize( PluginInterface );
