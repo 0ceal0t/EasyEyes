@@ -93,9 +93,9 @@ namespace EasyEyes {
             var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? 00 00 48 8D 8F ?? ?? 00 00 48 89 87 ?? ?? 00 00" );
             var getResourceAsyncAddress = scanner.ScanText( "E8 ?? ?? ?? 00 48 8B D8 EB ?? F0 FF 83 ?? ?? 00 00" );
 
-            ReadSqpackHook = new Hook<ReadSqpackPrototype>( readSqpackAddress, ReadSqpackHandler );
-            GetResourceSyncHook = new Hook<GetResourceSyncPrototype>( getResourceSyncAddress, GetResourceSyncHandler );
-            GetResourceAsyncHook = new Hook<GetResourceAsyncPrototype>( getResourceAsyncAddress, GetResourceAsyncHandler );
+            ReadSqpackHook = Hook<ReadSqpackPrototype>.FromAddress( readSqpackAddress, ReadSqpackHandler );
+            GetResourceSyncHook = Hook<GetResourceSyncPrototype>.FromAddress( getResourceSyncAddress, GetResourceSyncHandler );
+            GetResourceAsyncHook = Hook<GetResourceAsyncPrototype>.FromAddress( getResourceAsyncAddress, GetResourceAsyncHandler );
 
             ReadFile = Marshal.GetDelegateForFunctionPointer<ReadFilePrototype>( readFileAddress );
 
@@ -114,11 +114,11 @@ namespace EasyEyes {
             StaticVfxRun = Marshal.GetDelegateForFunctionPointer<StaticVfxRunDelegate>( staticVfxRunAddress );
             StaticVfxCreate = Marshal.GetDelegateForFunctionPointer<StaticVfxCreateDelegate>( staticVfxCreateAddress );
 
-            StaticVfxCreateHook = new Hook<StaticVfxCreateDelegate2>( staticVfxCreateAddress, StaticVfxNewHandler );
-            StaticVfxRemoveHook = new Hook<StaticVfxRemoveDelegate2>( staticVfxRemoveAddress, StaticVfxRemoveHandler );
+            StaticVfxCreateHook = Hook<StaticVfxCreateDelegate2>.FromAddress( staticVfxCreateAddress, StaticVfxNewHandler );
+            StaticVfxRemoveHook = Hook<StaticVfxRemoveDelegate2>.FromAddress( staticVfxRemoveAddress, StaticVfxRemoveHandler );
 
-            ActorVfxCreateHook = new Hook<ActorVfxCreateDelegate2>( actorVfxCreateAddress, ActorVfxNewHandler );
-            ActorVfxRemoveHook = new Hook<ActorVfxRemoveDelegate2>( actorVfxRemoveAddress, ActorVfxRemoveHandler );
+            ActorVfxCreateHook = Hook<ActorVfxCreateDelegate2>.FromAddress( actorVfxCreateAddress, ActorVfxNewHandler );
+            ActorVfxRemoveHook = Hook<ActorVfxRemoveDelegate2>.FromAddress( actorVfxRemoveAddress, ActorVfxRemoveHandler );
 
         }
 

@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0-windows</TargetFramework>
+        <TargetFramework>net7.0-windows</TargetFramework>
         <LangVersion>preview</LangVersion>
         <AssemblyTitle>VFXEditor</AssemblyTitle>
         <Company></Company>
         <Product>EasyEyes</Product>
         <Copyright>Copyright © 2020</Copyright>
-        <FileVersion>1.2.2.0</FileVersion>
-        <AssemblyVersion>1.2.2.0</AssemblyVersion>
+        <FileVersion>1.2.2.1</FileVersion>
+        <AssemblyVersion>1.2.2.1</AssemblyVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AssemblyName>EasyEyes</AssemblyName>
