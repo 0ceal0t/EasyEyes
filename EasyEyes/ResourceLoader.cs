@@ -2,43 +2,30 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using Dalamud.Plugin;
-using Reloaded.Hooks;
-using System.Threading.Tasks;
 using EasyEyes.Util;
-using EasyEyes.Structs;
 
 using Dalamud.Hooking;
 using Reloaded.Hooks.Definitions.X64;
 using System.Threading;
+using Penumbra.String.Classes;
 
 namespace EasyEyes {
-    public class ResourceLoader : IDisposable
-    {
+    public class ResourceLoader : IDisposable {
         private Plugin Plugin { get; set; }
         private bool IsEnabled { get; set; }
         private Crc32 Crc32 { get; }
 
-        // ===== FILES =========
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate byte ReadFilePrototype( IntPtr pFileHandler, SeFileDescriptor* pFileDesc, int priority, bool isSync );
-
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate byte ReadSqpackPrototype( IntPtr pFileHandler, SeFileDescriptor* pFileDesc, int priority, bool isSync );
-
         [Function( CallingConventions.Microsoft )]
         public unsafe delegate void* GetResourceSyncPrototype( IntPtr pFileManager, uint* pCategoryId, char* pResourceType,
-            uint* pResourceHash, char* pPath, void* pUnknown );
+            uint* pResourceHash, byte* pPath, void* pUnknown );
 
         [Function( CallingConventions.Microsoft )]
         public unsafe delegate void* GetResourceAsyncPrototype( IntPtr pFileManager, uint* pCategoryId, char* pResourceType,
-            uint* pResourceHash, char* pPath, void* pUnknown, bool isUnknown );
+            uint* pResourceHash, byte* pPath, void* pUnknown, bool isUnknown );
 
         // ====== FILES HOOKS ========
         public Hook<GetResourceSyncPrototype> GetResourceSyncHook { get; private set; }
         public Hook<GetResourceAsyncPrototype> GetResourceAsyncHook { get; private set; }
-        public Hook<ReadSqpackPrototype> ReadSqpackHook { get; private set; }
-        public ReadFilePrototype ReadFile { get; private set; }
 
         //====== STATIC ===========
         [UnmanagedFunctionPointer( CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
@@ -89,15 +76,11 @@ namespace EasyEyes {
             var scanner = Plugin.SigScanner;
 
             var readFileAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 84 C0 0F 84 ?? 00 00 00 4C 8B C3 BA 05" );
-            var readSqpackAddress = scanner.ScanText( "E8 ?? ?? ?? ?? EB 05 E8 ?? ?? ?? ?? 84 C0 0F 84 ?? 00 00 00 4C 8B C3" );
             var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? 00 00 48 8D 8F ?? ?? 00 00 48 89 87 ?? ?? 00 00" );
             var getResourceAsyncAddress = scanner.ScanText( "E8 ?? ?? ?? 00 48 8B D8 EB ?? F0 FF 83 ?? ?? 00 00" );
 
-            ReadSqpackHook = Hook<ReadSqpackPrototype>.FromAddress( readSqpackAddress, ReadSqpackHandler );
             GetResourceSyncHook = Hook<GetResourceSyncPrototype>.FromAddress( getResourceSyncAddress, GetResourceSyncHandler );
             GetResourceAsyncHook = Hook<GetResourceAsyncPrototype>.FromAddress( getResourceAsyncAddress, GetResourceAsyncHandler );
-
-            ReadFile = Marshal.GetDelegateForFunctionPointer<ReadFilePrototype>( readFileAddress );
 
             var staticVfxCreateAddress = scanner.ScanText( "E8 ?? ?? ?? ?? F3 0F 10 35 ?? ?? ?? ?? 48 89 43 08" );
             var staticVfxRunAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 8B 4B 7C 85 C9" );
@@ -152,8 +135,6 @@ namespace EasyEyes {
 
         public void Enable() {
             if( IsEnabled ) return;
-
-            ReadSqpackHook.Enable();
             GetResourceSyncHook.Enable();
             GetResourceAsyncHook.Enable();
 
@@ -171,7 +152,6 @@ namespace EasyEyes {
 
         public void Disable() {
             if( !IsEnabled ) return;
-            ReadSqpackHook.Disable();
             GetResourceSyncHook.Disable();
             GetResourceAsyncHook.Disable();
             StaticVfxCreateHook.Disable();
@@ -181,7 +161,6 @@ namespace EasyEyes {
 
             Thread.Sleep( 500 );
 
-            ReadSqpackHook.Dispose();
             GetResourceSyncHook.Dispose();
             GetResourceAsyncHook.Dispose();
             StaticVfxCreateHook.Dispose();
@@ -189,7 +168,6 @@ namespace EasyEyes {
             ActorVfxCreateHook.Dispose();
             ActorVfxRemoveHook.Dispose();
 
-            ReadSqpackHook = null;
             GetResourceSyncHook = null;
             GetResourceAsyncHook = null;
             StaticVfxCreateHook = null;
@@ -206,7 +184,7 @@ namespace EasyEyes {
             uint* pCategoryId,
             char* pResourceType,
             uint* pResourceHash,
-            char* pPath,
+            byte* pPath,
             void* pUnknown
         ) => GetResourceHandler( true, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, false );
 
@@ -215,7 +193,7 @@ namespace EasyEyes {
             uint* pCategoryId,
             char* pResourceType,
             uint* pResourceHash,
-            char* pPath,
+            byte* pPath,
             void* pUnknown,
             bool isUnknown
         ) => GetResourceHandler( false, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
@@ -226,7 +204,7 @@ namespace EasyEyes {
             uint* pCategoryId,
             char* pResourceType,
             uint* pResourceHash,
-            char* pPath,
+            byte* pPath,
             void* pUnknown,
             bool isUnknown
         ) => isSync
@@ -238,60 +216,28 @@ namespace EasyEyes {
             uint* pCategoryId,
             char* pResourceType,
             uint* pResourceHash,
-            char* pPath,
+            byte* pPath,
             void* pUnknown,
             bool isUnknown
         ) {
-            var gameFsPath = Marshal.PtrToStringAnsi( new IntPtr( pPath ) );
-
-            // ============ REPLACE THE FILE ============
-            FileInfo replaceFile = null;
-            if( Plugin?.Config != null && Plugin.Config.IsDisabled( gameFsPath )) {
-                replaceFile = new FileInfo( Plugin.FileLocation );
-            }
-
-            var fsPath = replaceFile?.FullName;
-
-            if( fsPath == null || fsPath.Length >= 260 ) {
+            if( !Utf8GamePath.FromPointer( pPath, out var gamePath ) ) {
                 return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
             }
-            var cleanPath = fsPath.Replace( '\\', '/' );
-            var path = Encoding.ASCII.GetBytes( cleanPath );
+
+            var gamePathString = gamePath.ToString();
+
+            if( Plugin?.Config == null || !Plugin.Config.IsDisabled( gamePathString ) ) {
+                return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
+            }
+
+            var path = Encoding.ASCII.GetBytes( "vfx/path/nothing.avfx" );
             var bPath = stackalloc byte[path.Length + 1];
             Marshal.Copy( path, 0, new IntPtr( bPath ), path.Length );
-            pPath = ( char* )bPath;
+            pPath = bPath;
             Crc32.Init();
             Crc32.Update( path );
             *pResourceHash = Crc32.Checksum;
             return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
-        }
-
-
-        private unsafe byte ReadSqpackHandler( IntPtr pFileHandler, SeFileDescriptor* pFileDesc, int priority, bool isSync ) {
-            var gameFsPath = GetString( pFileDesc->ResourceHandle->File );
-
-            var isRooted = Path.IsPathRooted( gameFsPath );
-            if( gameFsPath == null || gameFsPath.Length >= 260 || !isRooted ) {
-                return ReadSqpackHook.Original( pFileHandler, pFileDesc, priority, isSync );
-            }
-            pFileDesc->FileMode = Structs.FileMode.LoadUnpackedResource;
-
-            // note: must be utf16
-            var utfPath = Encoding.Unicode.GetBytes( gameFsPath );
-            Marshal.Copy( utfPath, 0, new IntPtr( &pFileDesc->UtfFileName ), utfPath.Length );
-            var fd = stackalloc byte[0x20 + utfPath.Length + 0x16];
-            Marshal.Copy( utfPath, 0, new IntPtr( fd + 0x21 ), utfPath.Length );
-            pFileDesc->FileDescriptor = fd;
-
-            return ReadFile( pFileHandler, pFileDesc, priority, isSync );
-        }
-
-        private static unsafe string GetString( StdString str ) {
-            var len = ( int )str.Size;
-            if( len > 15 ) {
-                return Dalamud.Memory.MemoryHelper.ReadString( new IntPtr( str.BufferPtr ), Encoding.ASCII, len );
-            }
-            return Dalamud.Memory.MemoryHelper.ReadString( new IntPtr( &str.BufferPtr ), Encoding.ASCII, len );
         }
     }
 }

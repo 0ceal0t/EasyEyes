@@ -73,6 +73,10 @@
             <HintPath>$(DalamudLibPath)Reloaded.Hooks.Definitions.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="FFXIVClientStructs">
+            <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
@@ -102,5 +106,9 @@
 
     <ItemGroup>
       <Folder Include="Files\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Penumbra.String\Penumbra.String.csproj" />
     </ItemGroup>
 </Project>
