@@ -2,8 +2,6 @@ using Dalamud.Configuration;
 using Dalamud.Plugin;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using VFXSelect.UI;
 
 namespace EasyEyes {
 
@@ -13,7 +11,7 @@ namespace EasyEyes {
         public string Notes = "";
         public bool Disabled = true;
 
-        public SavedItem(string path ) {
+        public SavedItem( string path ) {
             AVFXPath = path;
         }
     }
@@ -33,9 +31,9 @@ namespace EasyEyes {
             Config = this;
         }
 
-        public bool IsDisabled(string path ) {
-            foreach(var item in Items ) {
-                if(item.AVFXPath == path && item.Disabled ) {
+        public bool IsDisabled( string path ) {
+            foreach( var item in Items ) {
+                if( item.AVFXPath == path && item.Disabled ) {
                     return true;
                 }
             }
@@ -43,10 +41,10 @@ namespace EasyEyes {
         }
 
         // ============
-        public bool AddPath(string path, out SavedItem newItem ) {
+        public bool AddPath( string path, out SavedItem newItem ) {
             newItem = null;
-            foreach(var item in Items ) {
-                if(item.AVFXPath == path ) {
+            foreach( var item in Items ) {
+                if( item.AVFXPath == path ) {
                     return false;
                 }
             }
@@ -56,7 +54,7 @@ namespace EasyEyes {
             return true;
         }
 
-        public void RemoveItem(SavedItem item ) {
+        public void RemoveItem( SavedItem item ) {
             Items.Remove( item );
             Save();
         }

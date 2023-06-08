@@ -1,10 +1,3 @@
-using Dalamud.Plugin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace VFXSelect.Data.Rows {
     public class XivStatus {
         public bool LoopVFX1Exists = false;
@@ -14,7 +7,7 @@ namespace VFXSelect.Data.Rows {
 
         public string Name;
         public int RowId;
-        public ushort Icon;
+        public uint Icon;
 
         public string LoopVFXPath1;
         public string LoopVFXPath2;

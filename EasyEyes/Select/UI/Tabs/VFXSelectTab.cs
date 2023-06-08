@@ -1,9 +1,9 @@
+using ImGuiNET;
+using Lumina.Data.Files;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ImGuiNET;
-using Lumina.Data.Files;
 using VFXSelect.Data.Sheets;
 
 namespace VFXSelect.UI {
@@ -24,7 +24,7 @@ namespace VFXSelect.UI {
         public T Selected = default;
         public S Loaded = default;
 
-        public VFXSelectTab( string parentId, string tabId, SheetLoader<T,S> loader, VFXSelectDialog dialog) {
+        public VFXSelectTab( string parentId, string tabId, SheetLoader<T, S> loader, VFXSelectDialog dialog ) {
             Loader = loader;
             Dialog = dialog;
             Name = tabId;
@@ -32,7 +32,7 @@ namespace VFXSelect.UI {
             Id = "##Select/" + tabId + "/" + parentId;
         }
 
-        public abstract bool CheckMatch( T item, string searchInput);
+        public abstract bool CheckMatch( T item, string searchInput );
         public abstract string UniqueRowTitle( T item );
         public abstract void DrawSelected( S loadedItem );
         public virtual void DrawExtra() { }
@@ -54,7 +54,7 @@ namespace VFXSelect.UI {
             var ResetScroll = false;
             DrawExtra();
             if( ImGui.InputText( "Search" + Id, ref SearchInput, 255 ) ) {
-                Searched = Loader.Items.Where( x => CheckMatch(x, SearchInput )).ToList();
+                Searched = Loader.Items.Where( x => CheckMatch( x, SearchInput ) ).ToList();
                 ResetScroll = true;
             }
             ImGui.Columns( 2, Id + "Columns", true );
@@ -65,11 +65,11 @@ namespace VFXSelect.UI {
             var idx = 0;
             foreach( var item in Searched ) {
                 if( idx < preItems || idx > ( preItems + showItems ) ) { idx++; continue; }
-                if( ImGui.Selectable( UniqueRowTitle(item), EqualityComparer<T>.Default.Equals( Selected, item) ) ) {
+                if( ImGui.Selectable( UniqueRowTitle( item ), EqualityComparer<T>.Default.Equals( Selected, item ) ) ) {
                     if( !EqualityComparer<T>.Default.Equals( Selected, item ) ) {
                         Task.Run( async () => {
                             var result = Loader.SelectItem( item, out Loaded );
-                        });
+                        } );
                         Selected = item;
                         OnSelect();
                     }
@@ -100,7 +100,7 @@ namespace VFXSelect.UI {
             ImGui.EndTabItem();
         }
 
-        public void LoadIcon( ushort iconId, ref ImGuiScene.TextureWrap texWrap ) {
+        public void LoadIcon( uint iconId, ref ImGuiScene.TextureWrap texWrap ) {
             texWrap?.Dispose();
             texWrap = null;
             if( iconId > 0 ) {

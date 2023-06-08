@@ -1,10 +1,9 @@
-using System.Numerics;
 using EasyEyes.Structs.Vfx;
 using ImGuiNET;
+using System.Numerics;
 using VFXSelect.UI;
 
-namespace EasyEyes.UI
-{
+namespace EasyEyes.UI {
     public class MainInterface {
         private readonly Plugin Plugin;
         public bool Visible = false;
@@ -14,7 +13,7 @@ namespace EasyEyes.UI
         public VfxTab Vfx;
         public VFXSelectDialog SelectUI;
 
-        public MainInterface( Plugin plugin )  {
+        public MainInterface( Plugin plugin ) {
             Plugin = plugin;
             Log = new LogTab( plugin );
             Vfx = new VfxTab( plugin );
@@ -80,10 +79,10 @@ namespace EasyEyes.UI
         public static bool OkButton( string label, bool small = false ) {
             return ColoredButton( label, new Vector4( 0.10f, 0.80f, 0.10f, 1.0f ), small );
         }
-        public static bool RemoveButton(string label, bool small = false ) {
+        public static bool RemoveButton( string label, bool small = false ) {
             return ColoredButton( label, new Vector4( 0.80f, 0.10f, 0.10f, 1.0f ), small );
         }
-        public static bool ColoredButton( string label, Vector4 color, bool small) {
+        public static bool ColoredButton( string label, Vector4 color, bool small ) {
             var ret = false;
             ImGui.PushStyleColor( ImGuiCol.Button, color );
             if( small ) {
@@ -100,7 +99,7 @@ namespace EasyEyes.UI
             return ret;
         }
 
-        public void DrawSpawnButton(string text, string Id, string path, bool disabled) {
+        public void DrawSpawnButton( string text, string Id, string path, bool disabled ) {
             if( Plugin.SpawnVfx == null ) {
                 if( disabled ) ImGui.PushStyleVar( ImGuiStyleVar.Alpha, ImGui.GetStyle().Alpha * 0.5f );
                 ImGui.SameLine();

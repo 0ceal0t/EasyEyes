@@ -1,18 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using Dalamud.Game.Command;
-using Dalamud.Plugin;
-using System.Reflection;
-using EasyEyes.UI;
-using EasyEyes.Structs.Vfx;
-using VFXSelect;
-using VFXSelect.UI;
+using Dalamud.Data;
+using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game;
-using Dalamud.Data;
+using Dalamud.Game.Command;
 using Dalamud.Interface.ImGuiFileDialog;
+using Dalamud.Plugin;
+using EasyEyes.Structs.Vfx;
+using EasyEyes.UI;
+using System.Collections.Generic;
+using System.IO;
+using VFXSelect;
+using VFXSelect.UI;
 
 namespace EasyEyes {
     public class Plugin : IDalamudPlugin {
@@ -101,23 +99,16 @@ namespace EasyEyes {
             MainUI.Visible = !MainUI.Visible;
         }
 
-        public struct RecordedItem {
-            public string path;
-        }
-
         public void AddVfx( VFXSelectResult result ) {
             Config.AddPath( result.Path, out var _ );
         }
 
-        public List<RecordedItem> Recorded = new();
+        public List<string> Recorded = new();
         public bool DoRecord = false;
         public void AddRecord( string path ) {
             if( !DoRecord ) return;
-
-            var item = new RecordedItem {
-                path = path
-            };
-            Recorded.Add( item );
+            if( Recorded.Contains( path ) ) return;
+            Recorded.Add( path );
         }
 
         public void ClearRecord() {
