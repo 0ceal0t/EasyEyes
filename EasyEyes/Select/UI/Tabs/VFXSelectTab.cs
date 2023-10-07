@@ -1,10 +1,12 @@
+using Dalamud.Interface.Internal;
+using EasyEyes;
 using ImGuiNET;
-using Lumina.Data.Files;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VFXSelect.Data.Sheets;
+using static Dalamud.Plugin.Services.ITextureProvider;
 
 namespace VFXSelect.UI {
     public abstract class VFXSelectTab {
@@ -100,31 +102,13 @@ namespace VFXSelect.UI {
             ImGui.EndTabItem();
         }
 
-        public void LoadIcon( uint iconId, ref ImGuiScene.TextureWrap texWrap ) {
-            texWrap?.Dispose();
-            texWrap = null;
-            if( iconId > 0 ) {
-                TexFile tex;
-                try {
-                    tex = SheetManager.DataManager.GetIcon( iconId );
-                }
-                catch( Exception ) {
-                    tex = SheetManager.DataManager.GetIcon( 0 );
-                }
-                texWrap = SheetManager.PluginInterface.UiBuilder.LoadImageRaw( BGRA_to_RGBA( tex.ImageData ), tex.Header.Width, tex.Header.Height, 4 );
+        public void LoadIcon( uint iconId, ref IDalamudTextureWrap wrap ) {
+            try {
+                wrap = Services.TextureProvider.GetIcon( iconId < 0 ? 0 : iconId, IconFlags.None );
             }
-        }
-
-        public static byte[] BGRA_to_RGBA( byte[] data ) {
-            var ret = new byte[data.Length];
-            for( var i = 0; i < data.Length / 4; i++ ) {
-                var idx = i * 4;
-                ret[idx + 0] = data[idx + 2];
-                ret[idx + 1] = data[idx + 1];
-                ret[idx + 2] = data[idx + 0];
-                ret[idx + 3] = data[idx + 3];
+            catch( Exception ) {
+                wrap = Services.TextureProvider.GetIcon( 0, IconFlags.None );
             }
-            return ret;
         }
     }
 }

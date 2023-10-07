@@ -1,4 +1,4 @@
-using Dalamud.Logging;
+using EasyEyes;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace VFXSelect.Data.Sheets {
                     selectedItem = new XivMountSelected( file, item );
                 }
                 catch( Exception e ) {
-                    PluginLog.Error( "Error loading IMC file " + imcPath, e );
+                    Services.Error( e, "Error loading IMC file " + imcPath );
                     return false;
                 }
             }

@@ -1,4 +1,4 @@
-using Dalamud.Logging;
+using EasyEyes;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ namespace VFXSelect.Data.Sheets {
                 selectedItem = new XivEmoteSelected( item, files );
             }
             catch( Exception e ) {
-                PluginLog.Error( "Error reading emote file", e );
+                Services.Error( e, "Error reading emote file" );
                 return false;
             }
             return true;

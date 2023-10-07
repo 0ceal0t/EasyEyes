@@ -1,4 +1,4 @@
-using Dalamud.Logging;
+using EasyEyes;
 using System;
 using System.Linq;
 using VFXSelect.Data.Rows;
@@ -32,12 +32,12 @@ namespace VFXSelect.Data.Sheets {
                     selectedItem = new XivActionSelected( file, item );
                 }
                 catch( Exception e ) {
-                    PluginLog.Error( "Error reading TMB " + tmbPath, e );
+                    Services.Error( e, "Error reading TMB " + tmbPath );
                     return false;
                 }
             }
             else {
-                PluginLog.Error( tmbPath + " does not exist" );
+                Services.Error( tmbPath + " does not exist" );
             }
             return result;
         }

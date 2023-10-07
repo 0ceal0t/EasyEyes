@@ -1,10 +1,11 @@
-using System.Numerics;
+using Dalamud.Interface.Internal;
 using ImGuiNET;
+using System.Numerics;
 using VFXSelect.Data.Rows;
 
 namespace VFXSelect.UI {
     public class VFXHousingSelect : VFXSelectTab<XivHousing, XivHousingSelected> {
-        private ImGuiScene.TextureWrap Icon;
+        private IDalamudTextureWrap Icon;
 
         public VFXHousingSelect( string parentId, string tabId, VFXSelectDialog dialog ) :
             base( parentId, tabId, SheetManager.Housing, dialog ) {

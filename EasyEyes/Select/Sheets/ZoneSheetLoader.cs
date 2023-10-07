@@ -1,4 +1,4 @@
-using Dalamud.Logging;
+using EasyEyes;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace VFXSelect.Data.Sheets {
                     selectedItem = new XivZoneSelected( file, item );
                 }
                 catch( Exception e ) {
-                    PluginLog.Error( "Error reading LGB file " + lgbPath, e );
+                    Services.Error( e, "Error reading LGB file " + lgbPath );
                     return false;
                 }
             }

@@ -1,13 +1,11 @@
+using Dalamud.Hooking;
+using EasyEyes.Util;
+using Penumbra.String.Classes;
+using Reloaded.Hooks.Definitions.X64;
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using EasyEyes.Util;
-
-using Dalamud.Hooking;
-using Reloaded.Hooks.Definitions.X64;
 using System.Threading;
-using Penumbra.String.Classes;
 
 namespace EasyEyes {
     public class ResourceLoader : IDisposable {
@@ -73,14 +71,14 @@ namespace EasyEyes {
         }
 
         public unsafe void Init() {
-            var scanner = Plugin.SigScanner;
+            var scanner = Services.SigScanner;
 
             var readFileAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 84 C0 0F 84 ?? 00 00 00 4C 8B C3 BA 05" );
             var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? 00 00 48 8D 8F ?? ?? 00 00 48 89 87 ?? ?? 00 00" );
             var getResourceAsyncAddress = scanner.ScanText( "E8 ?? ?? ?? 00 48 8B D8 EB ?? F0 FF 83 ?? ?? 00 00" );
 
-            GetResourceSyncHook = Hook<GetResourceSyncPrototype>.FromAddress( getResourceSyncAddress, GetResourceSyncHandler );
-            GetResourceAsyncHook = Hook<GetResourceAsyncPrototype>.FromAddress( getResourceAsyncAddress, GetResourceAsyncHandler );
+            GetResourceSyncHook = Services.Hooks.HookFromAddress<GetResourceSyncPrototype>( getResourceSyncAddress, GetResourceSyncHandler );
+            GetResourceAsyncHook = Services.Hooks.HookFromAddress<GetResourceAsyncPrototype>( getResourceAsyncAddress, GetResourceAsyncHandler );
 
             var staticVfxCreateAddress = scanner.ScanText( "E8 ?? ?? ?? ?? F3 0F 10 35 ?? ?? ?? ?? 48 89 43 08" );
             var staticVfxRunAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 8B 4B 7C 85 C9" );
@@ -97,11 +95,11 @@ namespace EasyEyes {
             StaticVfxRun = Marshal.GetDelegateForFunctionPointer<StaticVfxRunDelegate>( staticVfxRunAddress );
             StaticVfxCreate = Marshal.GetDelegateForFunctionPointer<StaticVfxCreateDelegate>( staticVfxCreateAddress );
 
-            StaticVfxCreateHook = Hook<StaticVfxCreateDelegate2>.FromAddress( staticVfxCreateAddress, StaticVfxNewHandler );
-            StaticVfxRemoveHook = Hook<StaticVfxRemoveDelegate2>.FromAddress( staticVfxRemoveAddress, StaticVfxRemoveHandler );
+            StaticVfxCreateHook = Services.Hooks.HookFromAddress<StaticVfxCreateDelegate2>( staticVfxCreateAddress, StaticVfxNewHandler );
+            StaticVfxRemoveHook = Services.Hooks.HookFromAddress<StaticVfxRemoveDelegate2>( staticVfxRemoveAddress, StaticVfxRemoveHandler );
 
-            ActorVfxCreateHook = Hook<ActorVfxCreateDelegate2>.FromAddress( actorVfxCreateAddress, ActorVfxNewHandler );
-            ActorVfxRemoveHook = Hook<ActorVfxRemoveDelegate2>.FromAddress( actorVfxRemoveAddress, ActorVfxRemoveHandler );
+            ActorVfxCreateHook = Services.Hooks.HookFromAddress<ActorVfxCreateDelegate2>( actorVfxCreateAddress, ActorVfxNewHandler );
+            ActorVfxRemoveHook = Services.Hooks.HookFromAddress<ActorVfxRemoveDelegate2>( actorVfxRemoveAddress, ActorVfxRemoveHandler );
 
         }
 

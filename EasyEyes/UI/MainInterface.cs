@@ -41,15 +41,15 @@ namespace EasyEyes.UI {
         }
 
         public void SpawnOnGround( string path ) {
-            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Plugin.ClientState.LocalPlayer.Position );
+            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Services.ClientState.LocalPlayer.Position );
         }
 
         public void SpawnOnSelf( string path ) {
-            Plugin.SpawnVfx = new ActorVfx( Plugin, Plugin.ClientState.LocalPlayer, Plugin.ClientState.LocalPlayer, path );
+            Plugin.SpawnVfx = new ActorVfx( Plugin, Services.ClientState.LocalPlayer, Services.ClientState.LocalPlayer, path );
         }
 
         public void SpawnOnTarget( string path ) {
-            var t = Plugin.TargetManager.Target;
+            var t = Services.TargetManager.Target;
             if( t != null ) {
                 Plugin.SpawnVfx = new ActorVfx( Plugin, t, t, path );
             }
@@ -62,7 +62,7 @@ namespace EasyEyes.UI {
             SelectUI.Draw();
 
             ImGui.SetNextWindowSize( new Vector2( 400, 500 ), ImGuiCond.FirstUseEver );
-            var ret = ImGui.Begin( Plugin.Name, ref Visible );
+            var ret = ImGui.Begin( "EasyEyes", ref Visible );
             if( !ret ) return;
 
             ImGui.BeginTabBar( "MainInterfaceTabs" );

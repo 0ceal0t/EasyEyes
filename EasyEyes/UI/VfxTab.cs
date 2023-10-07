@@ -1,5 +1,4 @@
 using Dalamud.Interface;
-using Dalamud.Logging;
 using ImGuiNET;
 using System;
 using System.IO;
@@ -27,7 +26,7 @@ namespace EasyEyes.UI {
             ImGui.InputText( Id + "-Path", ref AddVfxPath, 255 );
             ImGui.SameLine();
             if( ImGui.Button( "Add Path" + Id ) ) {
-                if( Plugin.DataManager.FileExists( AddVfxPath ) ) {
+                if( Services.DataManager.FileExists( AddVfxPath ) ) {
                     Plugin.Config.AddPath( AddVfxPath, out var newItem );
                     SelectedVfx = newItem;
                 }
@@ -36,13 +35,13 @@ namespace EasyEyes.UI {
             ImGui.SameLine();
             ImGui.PushFont( UiBuilder.IconFont );
             if( ImGui.Button( $"{( char )FontAwesomeIcon.Search}", new Vector2( 30, 23 ) ) ) {
-                Plugin.MainUI.SelectUI.Show(showLocal: false);
+                Plugin.MainUI.SelectUI.Show( showLocal: false );
             }
             ImGui.PopFont();
 
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
-            ImGui.BeginChild( Id + "Tree", new Vector2(-1, ImGui.GetContentRegionAvail().Y - 22), true );
+            ImGui.BeginChild( Id + "Tree", new Vector2( -1, ImGui.GetContentRegionAvail().Y - 22 ), true );
             VFXSelectDialog.DisplayVisible( Plugin.Config.Items.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
             var idx = 0;
@@ -56,7 +55,7 @@ namespace EasyEyes.UI {
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + postItems * itemHeight );
             ImGui.EndChild();
 
-            if(ImGui.SmallButton("Export" + Id ) ) {
+            if( ImGui.SmallButton( "Export" + Id ) ) {
                 ExportDialog();
             }
             ImGui.SameLine();
@@ -70,8 +69,8 @@ namespace EasyEyes.UI {
                 ImGui.Text( "Select an item..." );
             }
             else {
-                ImGui.TextColored( new Vector4(0.1f, 0.8f, 0.1f, 1.0f), SelectedVfx.AVFXPath );
-                if(ImGui.SmallButton("Copy Path" + Id ) ) {
+                ImGui.TextColored( new Vector4( 0.1f, 0.8f, 0.1f, 1.0f ), SelectedVfx.AVFXPath );
+                if( ImGui.SmallButton( "Copy Path" + Id ) ) {
                     ImGui.SetClipboardText( SelectedVfx.AVFXPath );
                 }
                 ImGui.Checkbox( "Disabled" + Id, ref SelectedVfx.Disabled );
@@ -96,7 +95,7 @@ namespace EasyEyes.UI {
 
         public void ExportDialog() {
             Plugin.DialogManager.SaveFileDialog( "Select a Save Location", ".txt,.*", "exported_vfx", "txt", ( bool ok, string res ) => {
-                if ( ok ) {
+                if( ok ) {
                     try {
                         if( Plugin.Config.Items.Count > 0 ) {
                             var paths = Plugin.Config.Items.ConvertAll( x => x.AVFXPath ).ToArray();
@@ -104,7 +103,7 @@ namespace EasyEyes.UI {
                         }
                     }
                     catch( Exception ex ) {
-                        PluginLog.LogError( ex, "Could not select a file" );
+                        Services.Error( ex, "Could not select a file" );
                     }
                 }
             } );
@@ -122,7 +121,7 @@ namespace EasyEyes.UI {
                         }
                     }
                     catch( Exception ex ) {
-                        PluginLog.LogError( ex, "Could not select a file" );
+                        Services.Error( ex, "Could not select a file" );
                     }
                 }
             } );

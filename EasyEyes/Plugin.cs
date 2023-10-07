@@ -1,7 +1,3 @@
-using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
 using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Plugin;
@@ -14,15 +10,8 @@ using VFXSelect.UI;
 
 namespace EasyEyes {
     public class Plugin : IDalamudPlugin {
-        public string Name => "EasyEyes";
         private const string CommandName = "/easy";
 
-        public static DalamudPluginInterface PluginInterface { get; private set; }
-        public static ClientState ClientState { get; private set; }
-        public static CommandManager CommandManager { get; private set; }
-        public static SigScanner SigScanner { get; private set; }
-        public static DataManager DataManager { get; private set; }
-        public static TargetManager TargetManager { get; private set; }
         public static FileDialogManager DialogManager { get; private set; }
 
         public static ResourceLoader ResourceLoader { get; private set; }
@@ -35,40 +24,28 @@ namespace EasyEyes {
         public string RootLocation;
         public string FileLocation;
 
-        public Plugin(
-                DalamudPluginInterface pluginInterface,
-                ClientState clientState,
-                CommandManager commandManager,
-                SigScanner sigScanner,
-                DataManager dataManager,
-                TargetManager targetManager
-            ) {
-            PluginInterface = pluginInterface;
-            ClientState = clientState;
-            CommandManager = commandManager;
-            SigScanner = sigScanner;
-            DataManager = dataManager;
-            TargetManager = targetManager;
+        public Plugin( DalamudPluginInterface pluginInterface ) {
+            pluginInterface.Create<Services>();
             DialogManager = new();
 
-            Config = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Config.Initialize( PluginInterface );
+            Config = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            Config.Initialize( Services.PluginInterface );
 
             ResourceLoader = new ResourceLoader( this );
 
-            CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) {
+            Services.CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) {
                 HelpMessage = "toggle ui"
             } );
 
-            RootLocation = PluginInterface.AssemblyLocation.DirectoryName;
+            RootLocation = Services.PluginInterface.AssemblyLocation.DirectoryName;
 
             FileLocation = Path.Combine( RootLocation, "does_not_exist.avfx" );
 
             SheetManager.Initialize(
                 Path.Combine( RootLocation, "Files", "npc.csv" ),
                 Path.Combine( RootLocation, "Files", "monster_vfx.json" ),
-                DataManager,
-                PluginInterface
+                Services.DataManager,
+                Services.PluginInterface
             );
 
             MainUI = new MainInterface( this );
@@ -76,7 +53,7 @@ namespace EasyEyes {
             ResourceLoader.Init();
             ResourceLoader.Enable();
 
-            PluginInterface.UiBuilder.Draw += MainUI.Draw;
+            Services.PluginInterface.UiBuilder.Draw += MainUI.Draw;
         }
 
         public void ClearSpawnVfx() {
@@ -84,14 +61,14 @@ namespace EasyEyes {
         }
 
         public void Dispose() {
-            PluginInterface.UiBuilder.Draw -= MainUI.Draw;
+            Services.PluginInterface.UiBuilder.Draw -= MainUI.Draw;
 
             ResourceLoader?.Dispose();
 
             SpawnVfx?.Remove();
             SpawnVfx = null;
 
-            CommandManager.RemoveHandler( CommandName );
+            Services.CommandManager.RemoveHandler( CommandName );
             MainUI?.Dispose();
         }
 

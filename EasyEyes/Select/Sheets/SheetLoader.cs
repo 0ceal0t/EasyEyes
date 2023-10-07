@@ -1,4 +1,4 @@
-using Dalamud.Logging;
+using EasyEyes;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,13 +15,13 @@ namespace VFXSelect.Data.Sheets {
         public void Load() {
             if( Waiting ) return;
             Waiting = true;
-            PluginLog.Log( "Loading " + typeof( T ).Name );
+            Services.Log( "Loading " + typeof( T ).Name );
             Task.Run( async () => {
                 try {
                     OnLoad();
                 }
                 catch( Exception e ) {
-                    PluginLog.Error( "Error Loading " + typeof( T ).Name, e );
+                    Services.Error( e, "Error Loading " + typeof( T ).Name );
                 }
                 Loaded = true;
             } );

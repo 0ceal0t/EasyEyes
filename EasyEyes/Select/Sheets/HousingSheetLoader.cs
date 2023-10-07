@@ -1,5 +1,4 @@
-using Dalamud.Plugin;
-using Dalamud.Logging;
+using EasyEyes;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Linq;
@@ -29,7 +28,7 @@ namespace VFXSelect.Data.Sheets {
                     selectedItem = new XivHousingSelected( item, file );
                 }
                 catch( Exception e ) {
-                    PluginLog.Error( "Error loading SGB file " + sgbPath, e );
+                    Services.Error( e, "Error loading SGB file " + sgbPath );
                     return false;
                 }
             }

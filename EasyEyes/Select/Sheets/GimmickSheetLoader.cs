@@ -1,4 +1,4 @@
-using Dalamud.Logging;
+using EasyEyes;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
@@ -31,12 +31,12 @@ namespace VFXSelect.Data.Sheets {
                     selectedItem = new XivGimmickSelected( file, item );
                 }
                 catch( Exception e ) {
-                    PluginLog.Error( "Error reading TMB file " + tmbPath, e );
+                    Services.Error( e, "Error reading TMB file " + tmbPath );
                     return false;
                 }
             }
             else {
-                PluginLog.Error( tmbPath + " does not exist" );
+                Services.Error( tmbPath + " does not exist" );
             }
             return result;
         }

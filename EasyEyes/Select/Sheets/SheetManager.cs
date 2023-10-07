@@ -1,5 +1,5 @@
-using Dalamud.Data;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using VFXSelect.Data.Sheets;
 
 namespace VFXSelect {
@@ -7,7 +7,7 @@ namespace VFXSelect {
         public static string NpcCsv { get; private set; }
         public static string MonsterJson { get; private set; }
 
-        public static DataManager DataManager { get; private set; }
+        public static IDataManager DataManager { get; private set; }
         public static DalamudPluginInterface PluginInterface { get; private set; }
 
         public static ItemSheetLoader Items { get; private set; }
@@ -23,7 +23,7 @@ namespace VFXSelect {
         public static HousingSheetLoader Housing { get; private set; }
         public static CommonLoader Misc { get; private set; }
 
-        public static void Initialize( string npcCsv, string monsterJson, DataManager dataManager, DalamudPluginInterface pluginInterface ) {
+        public static void Initialize( string npcCsv, string monsterJson, IDataManager dataManager, DalamudPluginInterface pluginInterface ) {
             NpcCsv = npcCsv;
             MonsterJson = monsterJson;
             DataManager = dataManager;
