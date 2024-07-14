@@ -1,4 +1,3 @@
-using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Types;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -66,7 +65,7 @@ namespace EasyEyes.Structs.Vfx {
             };
         }
 
-        public void UpdatePosition( GameObject actor ) {
+        public void UpdatePosition( IGameObject actor ) {
             if( Vfx == null ) return;
             Vfx->Position = actor.Position;
         }

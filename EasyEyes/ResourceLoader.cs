@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 
 namespace EasyEyes {
-    public class ResourceLoader : IDisposable {
+    public class ResourceLoader {
         private Plugin Plugin { get; set; }
         private bool IsEnabled { get; set; }
         private Crc32 Crc32 { get; }
@@ -73,8 +73,8 @@ namespace EasyEyes {
         public unsafe void Init() {
             var scanner = Services.SigScanner;
 
-            var readFileAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 84 C0 0F 84 ?? 00 00 00 4C 8B C3 BA 05" );
-            var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? 00 00 48 8D 8F ?? ?? 00 00 48 89 87 ?? ?? 00 00" );
+            var readFileAddress = scanner.ScanText( "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 63 42" );
+            var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 48 8B D8 8B C7" );
             var getResourceAsyncAddress = scanner.ScanText( "E8 ?? ?? ?? 00 48 8B D8 EB ?? F0 FF 83 ?? ?? 00 00" );
 
             GetResourceSyncHook = Services.Hooks.HookFromAddress<GetResourceSyncPrototype>( getResourceSyncAddress, GetResourceSyncHandler );

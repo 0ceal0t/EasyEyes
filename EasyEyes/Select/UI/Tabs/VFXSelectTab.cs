@@ -1,4 +1,4 @@
-using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
 using EasyEyes;
 using ImGuiNET;
 using System;
@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VFXSelect.Data.Sheets;
-using static Dalamud.Plugin.Services.ITextureProvider;
 
 namespace VFXSelect.UI {
     public abstract class VFXSelectTab {
@@ -51,7 +50,7 @@ namespace VFXSelect.UI {
                 return;
             }
             //
-            if( Searched == null ) { Searched = new List<T>(); Searched.AddRange( Loader.Items ); }
+            Searched ??= [.. Loader.Items];
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
             var ResetScroll = false;
             DrawExtra();
@@ -102,12 +101,12 @@ namespace VFXSelect.UI {
             ImGui.EndTabItem();
         }
 
-        public void LoadIcon( uint iconId, ref IDalamudTextureWrap wrap ) {
+        public void LoadIcon( uint iconId, ref ISharedImmediateTexture wrap ) {
             try {
-                wrap = Services.TextureProvider.GetIcon( iconId < 0 ? 0 : iconId, IconFlags.None );
+                wrap = Services.TextureProvider.GetFromGameIcon( iconId < 0 ? 0 : iconId );
             }
             catch( Exception ) {
-                wrap = Services.TextureProvider.GetIcon( 0, IconFlags.None );
+                wrap = Services.TextureProvider.GetFromGameIcon( 0 );
             }
         }
     }

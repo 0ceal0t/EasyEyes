@@ -1,11 +1,11 @@
-using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
 using ImGuiNET;
 using System.Numerics;
 using VFXSelect.Data.Rows;
 
 namespace VFXSelect.UI {
     public class VFXMountSelect : VFXSelectTab<XivMount, XivMountSelected> {
-        private IDalamudTextureWrap Icon;
+        private ISharedImmediateTexture Icon;
 
         public VFXMountSelect( string parentId, string tabId, VFXSelectDialog dialog ) :
             base( parentId, tabId, SheetManager.Mounts, dialog ) {
@@ -24,8 +24,8 @@ namespace VFXSelect.UI {
             ImGui.Text( loadedItem.Mount.Name );
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
-            if( Icon != null ) {
-                ImGui.Image( Icon.ImGuiHandle, new Vector2( Icon.Width, Icon.Height ) );
+            if( Icon != null && Icon.GetWrapOrDefault() != null ) {
+                ImGui.Image( Icon.GetWrapOrDefault().ImGuiHandle, new Vector2( Icon.GetWrapOrDefault().Width, Icon.GetWrapOrDefault().Height ) );
             }
 
             ImGui.Text( "Variant: " + loadedItem.Mount.Variant );

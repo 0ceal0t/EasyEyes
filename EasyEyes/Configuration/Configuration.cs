@@ -19,14 +19,14 @@ namespace EasyEyes {
     [Serializable]
     public class Configuration : IPluginConfiguration {
         public int Version { get; set; } = 0;
-        public List<SavedItem> Items = new();
+        public List<SavedItem> Items = [];
 
         [NonSerialized]
-        private DalamudPluginInterface _pluginInterface;
+        private IDalamudPluginInterface _pluginInterface;
         [NonSerialized]
         public static Configuration Config;
 
-        public void Initialize( DalamudPluginInterface pluginInterface ) {
+        public void Initialize( IDalamudPluginInterface pluginInterface ) {
             _pluginInterface = pluginInterface;
             Config = this;
         }

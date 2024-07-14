@@ -8,7 +8,7 @@ namespace VFXSelect {
         public static string MonsterJson { get; private set; }
 
         public static IDataManager DataManager { get; private set; }
-        public static DalamudPluginInterface PluginInterface { get; private set; }
+        public static IDalamudPluginInterface PluginInterface { get; private set; }
 
         public static ItemSheetLoader Items { get; private set; }
         public static ActionSheetLoader Actions { get; private set; }
@@ -23,7 +23,7 @@ namespace VFXSelect {
         public static HousingSheetLoader Housing { get; private set; }
         public static CommonLoader Misc { get; private set; }
 
-        public static void Initialize( string npcCsv, string monsterJson, IDataManager dataManager, DalamudPluginInterface pluginInterface ) {
+        public static void Initialize( string npcCsv, string monsterJson, IDataManager dataManager, IDalamudPluginInterface pluginInterface ) {
             NpcCsv = npcCsv;
             MonsterJson = monsterJson;
             DataManager = dataManager;

@@ -24,7 +24,7 @@ namespace EasyEyes {
         public string RootLocation;
         public string FileLocation;
 
-        public Plugin( DalamudPluginInterface pluginInterface ) {
+        public Plugin( IDalamudPluginInterface pluginInterface ) {
             pluginInterface.Create<Services>();
             DialogManager = new();
 
@@ -54,6 +54,8 @@ namespace EasyEyes {
             ResourceLoader.Enable();
 
             Services.PluginInterface.UiBuilder.Draw += MainUI.Draw;
+            Services.PluginInterface.UiBuilder.OpenConfigUi += OpenMainUi;
+            Services.PluginInterface.UiBuilder.OpenMainUi += OpenMainUi;
         }
 
         public void ClearSpawnVfx() {
@@ -62,6 +64,8 @@ namespace EasyEyes {
 
         public void Dispose() {
             Services.PluginInterface.UiBuilder.Draw -= MainUI.Draw;
+            Services.PluginInterface.UiBuilder.OpenConfigUi -= OpenMainUi;
+            Services.PluginInterface.UiBuilder.OpenMainUi -= OpenMainUi;
 
             ResourceLoader?.Dispose();
 
@@ -72,6 +76,10 @@ namespace EasyEyes {
             MainUI?.Dispose();
         }
 
+        private void OpenMainUi() {
+            MainUI.Visible = true;
+        }
+
         private void OnCommand( string command, string rawArgs ) {
             MainUI.Visible = !MainUI.Visible;
         }
@@ -80,7 +88,7 @@ namespace EasyEyes {
             Config.AddPath( result.Path, out var _ );
         }
 
-        public List<string> Recorded = new();
+        public List<string> Recorded = [];
         public bool DoRecord = false;
         public void AddRecord( string path ) {
             if( !DoRecord ) return;
