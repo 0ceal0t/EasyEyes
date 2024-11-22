@@ -1,4 +1,4 @@
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +8,8 @@ using VFXSelect.Data.Rows;
 namespace VFXSelect.Data.Sheets {
     public class NpcSheetLoader : SheetLoader<XivNpc, XivNpcSelected> {
 
-        public Dictionary<int, string> NpcIdToName = new();
-        public Dictionary<string, List<string>> MonsterVfx = new();
+        public Dictionary<int, string> NpcIdToName = [];
+        public Dictionary<string, List<string>> MonsterVfx = [];
 
         public class NpcCsvRow {
             public int Id;
@@ -37,7 +37,7 @@ namespace VFXSelect.Data.Sheets {
         }
 
         public override bool SelectItem( XivNpc item, out XivNpcSelected selectedItem ) {
-            selectedItem = new XivNpcSelected( item, MonsterVfx.TryGetValue( item.Id, out var paths ) ? paths : new List<string>() );
+            selectedItem = new XivNpcSelected( item, MonsterVfx.TryGetValue( item.Id, out var paths ) ? paths : [] );
 
             return true;
         }

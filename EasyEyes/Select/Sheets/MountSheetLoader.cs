@@ -1,5 +1,5 @@
 using EasyEyes;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Linq;
 using VFXSelect.Data.Rows;
@@ -7,7 +7,7 @@ using VFXSelect.Data.Rows;
 namespace VFXSelect.Data.Sheets {
     public class MountSheeetLoader : SheetLoader<XivMount, XivMountSelected> {
         public override void OnLoad() {
-            var sheet = SheetManager.DataManager.GetExcelSheet<Mount>().Where( x => !string.IsNullOrEmpty( x.Singular ) );
+            var sheet = SheetManager.DataManager.GetExcelSheet<Mount>().Where( x => !string.IsNullOrEmpty( x.Singular.ExtractText() ) );
             foreach( var item in sheet ) {
                 Items.Add( new XivMount( item ) );
             }

@@ -1,5 +1,5 @@
 using EasyEyes;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +8,10 @@ using VFXSelect.Data.Rows;
 namespace VFXSelect.Data.Sheets {
     public class GimmickSheetLoader : SheetLoader<XivGimmick, XivGimmickSelected> {
         public override void OnLoad() {
-            var territories = SheetManager.DataManager.GetExcelSheet<TerritoryType>().Where( x => !string.IsNullOrEmpty( x.Name ) ).ToList();
+            var territories = SheetManager.DataManager.GetExcelSheet<TerritoryType>().Where( x => !string.IsNullOrEmpty( x.Name.ExtractText() ) ).ToList();
             var suffixToName = new Dictionary<string, string>();
             foreach( var zone in territories ) {
-                suffixToName[zone.Name.ToString()] = zone.PlaceName.Value?.Name.ToString();
+                suffixToName[zone.Name.ToString()] = zone.PlaceName.ValueNullable?.Name.ToString();
             }
 
             var sheet = SheetManager.DataManager.GetExcelSheet<ActionTimeline>().Where( x => x.Key.ToString().Contains( "gimmick" ) );

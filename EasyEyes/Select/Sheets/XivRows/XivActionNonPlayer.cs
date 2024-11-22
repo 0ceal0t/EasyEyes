@@ -7,13 +7,13 @@ namespace VFXSelect.Data.Rows {
         public bool IsPlaceholder = false;
         public List<XivActionNonPlayer> PlaceholderActions;
 
-        public XivActionNonPlayer( Lumina.Excel.GeneratedSheets.Action action, bool justSelf = false, string forceSelfKey = "" ) {
+        public XivActionNonPlayer( Lumina.Excel.Sheets.Action action, bool justSelf = false, string forceSelfKey = "" ) {
             Name = action.Name.ToString();
             RowId = ( int )action.RowId;
             Icon = action.Icon;
 
             if( forceSelfKey == "" ) {
-                SelfVFXKey = action.AnimationEnd?.Value?.Key.ToString();
+                SelfVFXKey = action.AnimationEnd.ValueNullable?.Key.ToString();
                 SelfVFXExists = !string.IsNullOrEmpty( SelfVFXKey );
                 if( SelfVFXExists ) {
                     var selfMKey = new MonsterKey( SelfVFXKey );
@@ -31,14 +31,14 @@ namespace VFXSelect.Data.Rows {
 
             if( !justSelf ) // when handling a hit vfx
             {
-                CastVFX = action.VFX?.Value?.VFX.Value?.Location;
+                CastVFX = action.VFX.ValueNullable?.VFX.ValueNullable?.Location.ExtractText();
                 CastVFXExists = !string.IsNullOrEmpty( CastVFX );
 
                 // split this off into its own item
-                HitVFXKey = action.ActionTimelineHit?.Value?.Key.ToString();
+                HitVFXKey = action.ActionTimelineHit.ValueNullable?.Key.ToString();
                 HitVFXExists = !string.IsNullOrEmpty( HitVFXKey ) && !HitVFXKey.Contains( "normal_hit" );
                 if( HitVFXExists ) {
-                    var sAction = new Lumina.Excel.GeneratedSheets.Action {
+                    var sAction = new Lumina.Excel.Sheets.Action {
                         Icon = action.Icon,
                         Name = new Lumina.Text.SeString( Encoding.UTF8.GetBytes( Name + " / Target" ) ),
                         IsPlayerAction = action.IsPlayerAction,
@@ -53,8 +53,8 @@ namespace VFXSelect.Data.Rows {
         }
     }
 
-    public struct MonsterKey {
-        public static readonly Regex rx = new( @"mon_sp\/(.*?)\/(.*)", RegexOptions.Compiled );
+    public partial struct MonsterKey {
+        public static readonly Regex rx = MonsterRegex();
 
         public bool isMonster;
         public string skeletonKey;
@@ -73,5 +73,8 @@ namespace VFXSelect.Data.Rows {
                 actionId = "";
             }
         }
+
+        [GeneratedRegex( @"mon_sp\/(.*?)\/(.*)", RegexOptions.Compiled )]
+        private static partial Regex MonsterRegex();
     }
 }

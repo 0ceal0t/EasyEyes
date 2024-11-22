@@ -1,5 +1,5 @@
 using EasyEyes;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Linq;
 using VFXSelect.Data.Rows;

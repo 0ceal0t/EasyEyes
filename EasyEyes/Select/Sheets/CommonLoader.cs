@@ -1,12 +1,11 @@
-using Dalamud.Plugin;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.Linq;
 using VFXSelect.Data.Rows;
 
 namespace VFXSelect.Data.Sheets {
     public class CommonLoader : SheetLoader<XivCommon, XivCommon> {
         public override void OnLoad() {
-            Items = new() {
+            Items = [
                 new XivCommon( 0, "vfx/action/ab_swd_abl020/eff/abi_swd020c1t.avfx", "Passage of Arms", 2515 ),
                 new XivCommon( 1, "vfx/action/ab_2gn026/eff/ab_2gn026c0c.avfx", "Flamethrower", 3038 ),
                 new XivCommon( 2, "vfx/action/ab_2kt008/eff/ab_2kt008c1t.avfx", "Meditate", 3172 ),
@@ -23,11 +22,11 @@ namespace VFXSelect.Data.Sheets {
                 new XivCommon( 13, "vfx/common/eff/m7004sp_05d0t.avfx", "Earthen Fury", 2705 ),
                 new XivCommon( 14, "vfx/common/eff/m7005sp_32d0t.avfx", "Slipstream", 2716 ),
                 new XivCommon( 15, "vfx/common/eff/ab_chk012c0c.avfx", "Improvisation", 3477 ),
-            };
+            ];
 
-            var sheet = SheetManager.DataManager.GetExcelSheet<VFX>().Where( x => !string.IsNullOrEmpty(x.Location) );
+            var sheet = SheetManager.DataManager.GetExcelSheet<VFX>().Where( x => !string.IsNullOrEmpty( x.Location.ExtractText() ) );
             foreach( var item in sheet ) {
-                Items.Add( new XivCommon(item) );
+                Items.Add( new XivCommon( item ) );
             }
         }
 

@@ -1,5 +1,5 @@
 using EasyEyes;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Linq;
 using VFXSelect.Data.Rows;
@@ -7,7 +7,7 @@ using VFXSelect.Data.Rows;
 namespace VFXSelect.Data.Sheets {
     public class CutsceneSheetLoader : SheetLoader<XivCutscene, XivCutsceneSelected> {
         public override void OnLoad() {
-            var sheet = SheetManager.DataManager.GetExcelSheet<Cutscene>().Where( x => !string.IsNullOrEmpty( x.Path ) );
+            var sheet = SheetManager.DataManager.GetExcelSheet<Cutscene>().Where( x => !string.IsNullOrEmpty( x.Path.ExtractText() ) );
             foreach( var item in sheet ) {
                 Items.Add( new XivCutscene( item ) );
             }

@@ -1,11 +1,11 @@
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.Linq;
 using VFXSelect.Data.Rows;
 
 namespace VFXSelect.Data.Sheets {
     public class StatusSheetLoader : SheetLoader<XivStatus, XivStatus> {
         public override void OnLoad() {
-            var sheet = SheetManager.DataManager.GetExcelSheet<Status>().Where( x => !string.IsNullOrEmpty( x.Name ) );
+            var sheet = SheetManager.DataManager.GetExcelSheet<Status>().Where( x => !string.IsNullOrEmpty( x.Name.ExtractText() ) );
             foreach( var item in sheet ) {
                 var i = new XivStatus( item );
                 if( i.VfxExists ) {

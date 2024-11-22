@@ -1,9 +1,4 @@
-using Dalamud.Plugin;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VFXSelect.Data.Rows {
     public class XivGimmick {
@@ -12,7 +7,7 @@ namespace VFXSelect.Data.Rows {
 
         public string TmbPath;
 
-        public XivGimmick( Lumina.Excel.GeneratedSheets.ActionTimeline timeline, Dictionary<string, string> suffixToName ) {
+        public XivGimmick( Lumina.Excel.Sheets.ActionTimeline timeline, Dictionary<string, string> suffixToName ) {
             RowId = ( int )timeline.RowId;
             Name = timeline.Key.ToString();
             TmbPath = "chara/action/" + Name + ".tmb";
@@ -21,8 +16,8 @@ namespace VFXSelect.Data.Rows {
             var split = Name.Split( '_' );
             if( split.Length > 0 ) {
                 var suffix = split[0];
-                if( suffixToName.ContainsKey( suffix ) ) {
-                    Name = "(" + suffixToName[suffix] + ") " + Name;
+                if( suffixToName.TryGetValue( suffix, out var value ) ) {
+                    Name = "(" + value + ") " + Name;
                 }
             }
         }

@@ -12,7 +12,7 @@ namespace VFXSelect.Data.Rows {
             Icon = icon;
         }
 
-        public XivCommon( Lumina.Excel.GeneratedSheets.VFX vfx ) {
+        public XivCommon( Lumina.Excel.Sheets.VFX vfx ) {
             RowId = ( int )vfx.RowId;
             Icon = 0;
             Name = vfx.Location.ToString();

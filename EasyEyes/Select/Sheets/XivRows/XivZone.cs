@@ -1,10 +1,3 @@
-using Dalamud.Plugin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace VFXSelect.Data.Rows {
 
     public class XivZone {
@@ -16,8 +9,8 @@ namespace VFXSelect.Data.Rows {
         // ffxiv/fst_f1/bah/f1bz/level/f1bz
         // bg/ffxiv/fst_f1/bah/f1bz/level/vfx.lgb
 
-        public XivZone( Lumina.Excel.GeneratedSheets.TerritoryType zone ) {
-            Name = zone.PlaceName.Value?.Name.ToString();
+        public XivZone( Lumina.Excel.Sheets.TerritoryType zone ) {
+            Name = zone.PlaceName.ValueNullable?.Name.ToString();
             RowId = ( int )zone.RowId;
 
             var bg = zone.Bg.ToString().Split( '/' );

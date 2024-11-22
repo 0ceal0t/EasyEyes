@@ -1,5 +1,5 @@
 using EasyEyes;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using VFXSelect.Data.Rows;
 namespace VFXSelect.Data.Sheets {
     public class EmoteSheetLoader : SheetLoader<XivEmote, XivEmoteSelected> {
         public override void OnLoad() {
-            var sheet = SheetManager.DataManager.GetExcelSheet<Emote>().Where( x => !string.IsNullOrEmpty( x.Name ) );
+            var sheet = SheetManager.DataManager.GetExcelSheet<Emote>().Where( x => !string.IsNullOrEmpty( x.Name.ExtractText() ) );
             foreach( var item in sheet ) {
                 var i = new XivEmote( item );
                 if( i.PapFiles.Count > 0 ) {

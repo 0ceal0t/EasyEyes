@@ -1,10 +1,3 @@
-using Dalamud.Plugin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace VFXSelect.Data.Rows {
     public enum NpcType {
         Demihuman = 2,
@@ -24,7 +17,7 @@ namespace VFXSelect.Data.Rows {
         public string RootPath;
         public string Id;
 
-        public XivNpcBase( Lumina.Excel.GeneratedSheets.ModelChara npc ) {
+        public XivNpcBase( Lumina.Excel.Sheets.ModelChara npc ) {
             RowId = ( int )npc.RowId;
             ModelId = npc.Model;
             BaseId = npc.Base;

@@ -1,9 +1,5 @@
-using Dalamud.Plugin;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace VFXSelect.Data.Rows {
     public struct XivItemIds {
@@ -42,7 +38,7 @@ namespace VFXSelect.Data.Rows {
         public int RowId;
         public ushort Icon;
 
-        public XivItem( Lumina.Excel.GeneratedSheets.Item item ) {
+        public XivItem( Lumina.Excel.Sheets.Item item ) {
             Name = item.Name.ToString();
             RowId = ( int )item.RowId;
             Icon = item.Icon;
@@ -53,7 +49,7 @@ namespace VFXSelect.Data.Rows {
             HasSub = ( SecondaryIds.PrimaryId != 0 );
 
             if( HasSub ) {
-                var sItem = new Lumina.Excel.GeneratedSheets.Item {
+                var sItem = new Lumina.Excel.Sheets.Item {
                     Name = new Lumina.Text.SeString( Encoding.UTF8.GetBytes( Name + " / Offhand" ) ),
                     Icon = item.Icon,
                     EquipRestriction = item.EquipRestriction,
