@@ -1,8 +1,8 @@
 using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using VFXSelect.UI;
 
 namespace EasyEyes.UI {
     public class LogTab {
@@ -68,7 +68,7 @@ namespace EasyEyes.UI {
             ImGui.BeginChild( Id + "Tree", new Vector2( -1, -1 ), true );
 
             if( searched.Count > 0 ) {
-                VFXSelectDialog.DisplayVisible( searched.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
+                DisplayVisible( searched.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
                 ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
                 if( resetScroll ) { ImGui.SetScrollHereY(); };
 
@@ -90,6 +90,16 @@ namespace EasyEyes.UI {
 
             ImGui.EndChild();
             ImGui.EndTabItem();
+        }
+
+        public static void DisplayVisible( int count, out int preItems, out int showItems, out int postItems, out float itemHeight ) {
+            var childHeight = ImGui.GetWindowSize().Y - ImGui.GetCursorPosY();
+            var scrollY = ImGui.GetScrollY();
+            var style = ImGui.GetStyle();
+            itemHeight = ImGui.GetTextLineHeight() + style.ItemSpacing.Y;
+            preItems = ( int )Math.Floor( scrollY / itemHeight );
+            showItems = ( int )Math.Ceiling( childHeight / itemHeight );
+            postItems = count - showItems - preItems;
         }
     }
 }

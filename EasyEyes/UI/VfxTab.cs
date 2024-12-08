@@ -1,9 +1,7 @@
-using Dalamud.Interface;
 using ImGuiNET;
 using System;
 using System.IO;
 using System.Numerics;
-using VFXSelect.UI;
 
 namespace EasyEyes.UI {
     public class VfxTab {
@@ -32,17 +30,11 @@ namespace EasyEyes.UI {
                 }
                 AddVfxPath = "";
             }
-            ImGui.SameLine();
-            ImGui.PushFont( UiBuilder.IconFont );
-            if( ImGui.Button( $"{( char )FontAwesomeIcon.Search}", new Vector2( 30, 23 ) ) ) {
-                Plugin.MainUI.SelectUI.Show( showLocal: false );
-            }
-            ImGui.PopFont();
 
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + 5 );
 
             ImGui.BeginChild( Id + "Tree", new Vector2( -1, ImGui.GetContentRegionAvail().Y - 22 ), true );
-            VFXSelectDialog.DisplayVisible( Plugin.Config.Items.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
+            LogTab.DisplayVisible( Plugin.Config.Items.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
             ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
             var idx = 0;
             foreach( var item in Plugin.Config.Items ) {

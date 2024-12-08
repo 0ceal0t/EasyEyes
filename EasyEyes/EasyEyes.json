@@ -8,6 +8,6 @@
     "RepoUrl": "https://github.com/0ceal0t/EasyEyes",
     "ApplicableVersion": "any",
     "Tags": [ "VFX", "AVFX" ],
-    "DalamudApiLevel": 10,
+    "DalamudApiLevel": 11,
     "LoadPriority": 69419
 }

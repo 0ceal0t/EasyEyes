@@ -5,10 +5,41 @@ using EasyEyes.Structs.Vfx;
 using EasyEyes.UI;
 using System.Collections.Generic;
 using System.IO;
-using VFXSelect;
-using VFXSelect.UI;
 
 namespace EasyEyes {
+    public enum VFXSelectType {
+        Local,
+        GamePath,
+        GameItem,
+        GameStatus,
+        GameAction,
+        GameZone,
+        GameEmote,
+        GameGimmick,
+        GameCutscene,
+        GameNpc
+    }
+
+    public struct VFXSelectResult {
+        public VFXSelectType Type;
+        public string DisplayString;
+        public string Path;
+
+        public VFXSelectResult( VFXSelectType type, string displayString, string path ) {
+            Type = type;
+            DisplayString = displayString;
+            Path = path;
+        }
+
+        public static VFXSelectResult None() {
+            var s = new VFXSelectResult {
+                DisplayString = "[NONE]",
+                Path = ""
+            };
+            return s;
+        }
+    }
+
     public class Plugin : IDalamudPlugin {
         private const string CommandName = "/easy";
 
@@ -40,13 +71,6 @@ namespace EasyEyes {
             RootLocation = Services.PluginInterface.AssemblyLocation.DirectoryName;
 
             FileLocation = Path.Combine( RootLocation, "does_not_exist.avfx" );
-
-            SheetManager.Initialize(
-                Path.Combine( RootLocation, "Files", "npc.csv" ),
-                Path.Combine( RootLocation, "Files", "monster_vfx.json" ),
-                Services.DataManager,
-                Services.PluginInterface
-            );
 
             MainUI = new MainInterface( this );
 

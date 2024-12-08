@@ -1,7 +1,6 @@
 using EasyEyes.Structs.Vfx;
 using ImGuiNET;
 using System.Numerics;
-using VFXSelect.UI;
 
 namespace EasyEyes.UI {
     public class MainInterface {
@@ -11,24 +10,11 @@ namespace EasyEyes.UI {
 
         public LogTab Log;
         public VfxTab Vfx;
-        public VFXSelectDialog SelectUI;
 
         public MainInterface( Plugin plugin ) {
             Plugin = plugin;
             Log = new LogTab( plugin );
             Vfx = new VfxTab( plugin );
-
-            SelectUI = new VFXSelectDialog(
-                "File Select",
-                null,
-                showSpawn: true,
-                spawnVfxExists: () => SpawnExists(),
-                removeSpawnVfx: () => RemoveSpawnVfx(),
-                spawnOnGround: ( string path ) => SpawnOnGround( path ),
-                spawnOnSelf: ( string path ) => SpawnOnSelf( path ),
-                spawnOnTarget: ( string path ) => SpawnOnTarget( path )
-            );
-            SelectUI.OnSelect += Plugin.AddVfx;
         }
 
         public bool SpawnExists() {
@@ -59,7 +45,6 @@ namespace EasyEyes.UI {
             if( !Visible ) return;
 
             Plugin.DialogManager.Draw();
-            SelectUI.Draw();
 
             ImGui.SetNextWindowSize( new Vector2( 400, 500 ), ImGuiCond.FirstUseEver );
             var ret = ImGui.Begin( "EasyEyes", ref Visible );
