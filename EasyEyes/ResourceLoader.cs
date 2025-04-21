@@ -1,69 +1,60 @@
 using Dalamud.Hooking;
 using EasyEyes.Util;
 using Penumbra.String.Classes;
-using Reloaded.Hooks.Definitions.X64;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
 namespace EasyEyes {
-    public class ResourceLoader {
+    public unsafe class ResourceLoader {
         private Plugin Plugin { get; set; }
         private bool IsEnabled { get; set; }
         private Crc32 Crc32 { get; }
 
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate void* GetResourceSyncPrototype( IntPtr pFileManager, uint* pCategoryId, char* pResourceType,
-            uint* pResourceHash, byte* pPath, void* pUnknown );
+        public delegate void* GetResourceSyncPrototype( IntPtr resourceManager, uint* categoryId, char* resourceType,
+            uint* resourceHash, byte* path, void* resParams );
 
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate void* GetResourceAsyncPrototype( IntPtr pFileManager, uint* pCategoryId, char* pResourceType,
-            uint* pResourceHash, byte* pPath, void* pUnknown, bool isUnknown );
+        public delegate void* GetResourceAsyncPrototype( IntPtr resourceManager, uint* categoryId, char* resourceType,
+            uint* resourceHash, byte* path, void* resParams, bool isUnknown );
 
         // ====== FILES HOOKS ========
+
         public Hook<GetResourceSyncPrototype> GetResourceSyncHook { get; private set; }
+
         public Hook<GetResourceAsyncPrototype> GetResourceAsyncHook { get; private set; }
 
         //====== STATIC ===========
-        [UnmanagedFunctionPointer( CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
-        public unsafe delegate IntPtr StaticVfxCreateDelegate( string path, string pool );
+        public delegate IntPtr StaticVfxCreateDelegate( string path, string pool );
+
         public StaticVfxCreateDelegate StaticVfxCreate;
 
-        [UnmanagedFunctionPointer( CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
-        public unsafe delegate IntPtr StaticVfxRunDelegate( IntPtr vfx, float a1, uint a2 );
+        public delegate IntPtr StaticVfxRunDelegate( IntPtr vfx, float a1, uint a2 );
+
         public StaticVfxRunDelegate StaticVfxRun;
 
-        [UnmanagedFunctionPointer( CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
-        public unsafe delegate IntPtr StaticVfxRemoveDelegate( IntPtr vfx );
+        public delegate IntPtr StaticVfxRemoveDelegate( IntPtr vfx );
+
         public StaticVfxRemoveDelegate StaticVfxRemove;
 
         // ======= STATIC HOOKS ========
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate IntPtr StaticVfxCreateDelegate2( char* path, char* pool );
-        public Hook<StaticVfxCreateDelegate2> StaticVfxCreateHook { get; private set; }
+        public Hook<StaticVfxCreateDelegate> StaticVfxCreateHook { get; private set; }
 
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate IntPtr StaticVfxRemoveDelegate2( IntPtr vfx );
-        public Hook<StaticVfxRemoveDelegate2> StaticVfxRemoveHook { get; private set; }
+        public Hook<StaticVfxRemoveDelegate> StaticVfxRemoveHook { get; private set; }
 
         // ======== ACTOR =============
-        [UnmanagedFunctionPointer( CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
-        public unsafe delegate IntPtr ActorVfxCreateDelegate( string a1, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 );
+        public delegate IntPtr ActorVfxCreateDelegate( string path, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 );
+
         public ActorVfxCreateDelegate ActorVfxCreate;
 
-        [UnmanagedFunctionPointer( CallingConvention.Cdecl, CharSet = CharSet.Ansi )]
-        public unsafe delegate IntPtr ActorVfxRemoveDelegate( IntPtr vfx, char a2 );
+        public delegate IntPtr ActorVfxRemoveDelegate( IntPtr vfx, char a2 );
+
         public ActorVfxRemoveDelegate ActorVfxRemove;
 
         // ======== ACTOR HOOKS =============
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate IntPtr ActorVfxCreateDelegate2( char* a1, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 );
-        public Hook<ActorVfxCreateDelegate2> ActorVfxCreateHook { get; private set; }
+        public Hook<ActorVfxCreateDelegate> ActorVfxCreateHook { get; private set; }
 
-        [Function( CallingConventions.Microsoft )]
-        public unsafe delegate IntPtr ActorVfxRemoveDelegate2( IntPtr vfx, char a2 );
-        public Hook<ActorVfxRemoveDelegate2> ActorVfxRemoveHook { get; private set; }
+        public Hook<ActorVfxRemoveDelegate> ActorVfxRemoveHook { get; private set; }
 
         public ResourceLoader( Plugin plugin ) {
             Plugin = plugin;
@@ -73,7 +64,6 @@ namespace EasyEyes {
         public unsafe void Init() {
             var scanner = Services.SigScanner;
 
-            var readFileAddress = scanner.ScanText( "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 41 54 41 55 41 56 41 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 63 42" );
             var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 48 8B D8 8B C7" );
             var getResourceAsyncAddress = scanner.ScanText( "E8 ?? ?? ?? 00 48 8B D8 EB ?? F0 FF 83 ?? ?? 00 00" );
 
@@ -95,18 +85,17 @@ namespace EasyEyes {
             StaticVfxRun = Marshal.GetDelegateForFunctionPointer<StaticVfxRunDelegate>( staticVfxRunAddress );
             StaticVfxCreate = Marshal.GetDelegateForFunctionPointer<StaticVfxCreateDelegate>( staticVfxCreateAddress );
 
-            StaticVfxCreateHook = Services.Hooks.HookFromAddress<StaticVfxCreateDelegate2>( staticVfxCreateAddress, StaticVfxNewHandler );
-            StaticVfxRemoveHook = Services.Hooks.HookFromAddress<StaticVfxRemoveDelegate2>( staticVfxRemoveAddress, StaticVfxRemoveHandler );
+            StaticVfxCreateHook = Services.Hooks.HookFromAddress<StaticVfxCreateDelegate>( staticVfxCreateAddress, StaticVfxNewHandler );
+            StaticVfxRemoveHook = Services.Hooks.HookFromAddress<StaticVfxRemoveDelegate>( staticVfxRemoveAddress, StaticVfxRemoveHandler );
 
-            ActorVfxCreateHook = Services.Hooks.HookFromAddress<ActorVfxCreateDelegate2>( actorVfxCreateAddress, ActorVfxNewHandler );
-            ActorVfxRemoveHook = Services.Hooks.HookFromAddress<ActorVfxRemoveDelegate2>( actorVfxRemoveAddress, ActorVfxRemoveHandler );
+            ActorVfxCreateHook = Services.Hooks.HookFromAddress<ActorVfxCreateDelegate>( actorVfxCreateAddress, ActorVfxNewHandler );
+            ActorVfxRemoveHook = Services.Hooks.HookFromAddress<ActorVfxRemoveDelegate>( actorVfxRemoveAddress, ActorVfxRemoveHandler );
 
         }
 
-        private unsafe IntPtr StaticVfxNewHandler( char* path, char* pool ) {
-            var vfxPath = Dalamud.Memory.MemoryHelper.ReadString( new IntPtr( path ), Encoding.ASCII, 256 );
+        private unsafe IntPtr StaticVfxNewHandler( string path, string pool ) {
             var vfx = StaticVfxCreateHook.Original( path, pool );
-            Plugin.AddRecord( vfxPath );
+            Plugin.AddRecord( path );
             return vfx;
         }
 
@@ -117,10 +106,9 @@ namespace EasyEyes {
             return StaticVfxRemoveHook.Original( vfx );
         }
 
-        private unsafe IntPtr ActorVfxNewHandler( char* a1, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 ) {
-            var vfxPath = Dalamud.Memory.MemoryHelper.ReadString( new IntPtr( a1 ), Encoding.ASCII, 256 );
+        private unsafe IntPtr ActorVfxNewHandler( string a1, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 ) {
             var vfx = ActorVfxCreateHook.Original( a1, a2, a3, a4, a5, a6, a7 );
-            Plugin.AddRecord( vfxPath );
+            Plugin.AddRecord( a1 );
             return vfx;
         }
 
