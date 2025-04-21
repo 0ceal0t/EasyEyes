@@ -1,5 +1,6 @@
 using Dalamud.Hooking;
 using EasyEyes.Util;
+using Penumbra.String;
 using Penumbra.String.Classes;
 using System;
 using System.Runtime.InteropServices;
@@ -206,7 +207,7 @@ namespace EasyEyes {
             void* pUnknown,
             bool isUnknown
         ) {
-            if( !Utf8GamePath.FromPointer( pPath, out var gamePath ) ) {
+            if( !Utf8GamePath.FromPointer( pPath, MetaDataComputation.None, out var gamePath ) ) {
                 return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
             }
 
