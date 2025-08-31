@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +70,8 @@ namespace EasyEyes.UI {
             if( searched.Count > 0 ) {
                 DisplayVisible( searched.Count, out var preItems, out var showItems, out var postItems, out var itemHeight );
                 ImGui.SetCursorPosY( ImGui.GetCursorPosY() + preItems * itemHeight );
-                if( resetScroll ) { ImGui.SetScrollHereY(); };
+                if( resetScroll ) { ImGui.SetScrollHereY(); }
+                ;
 
                 var idx = 0;
                 foreach( var item in searched ) {

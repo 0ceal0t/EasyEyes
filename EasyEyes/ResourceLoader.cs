@@ -65,14 +65,14 @@ namespace EasyEyes {
         public unsafe void Init() {
             var scanner = Services.SigScanner;
 
-            var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 48 8B D8 8B C7" );
+            var getResourceSyncAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 48 8B C8 8B C3 F0 0F C0 81" );
             var getResourceAsyncAddress = scanner.ScanText( "E8 ?? ?? ?? 00 48 8B D8 EB ?? F0 FF 83 ?? ?? 00 00" );
 
             GetResourceSyncHook = Services.Hooks.HookFromAddress<GetResourceSyncPrototype>( getResourceSyncAddress, GetResourceSyncHandler );
             GetResourceAsyncHook = Services.Hooks.HookFromAddress<GetResourceAsyncPrototype>( getResourceAsyncAddress, GetResourceAsyncHandler );
 
             var staticVfxCreateAddress = scanner.ScanText( "E8 ?? ?? ?? ?? F3 0F 10 35 ?? ?? ?? ?? 48 89 43 08" );
-            var staticVfxRunAddress = scanner.ScanText( "E8 ?? ?? ?? ?? 8B 4B 7C 85 C9" );
+            var staticVfxRunAddress = scanner.ScanText( "E8 ?? ?? ?? ?? B0 02 EB 02" );
             var staticVfxRemoveAddress = scanner.ScanText( "40 53 48 83 EC 20 48 8B D9 48 8B 89 ?? ?? ?? ?? 48 85 C9 74 28 33 D2 E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 48 85 C9" );
 
             var actorVfxCreateAddress = scanner.ScanText( "40 53 55 56 57 48 81 EC ?? ?? ?? ?? 0F 29 B4 24 ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 0F B6 AC 24 ?? ?? ?? ?? 0F 28 F3 49 8B F8" );
