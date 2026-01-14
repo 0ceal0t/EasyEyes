@@ -27,11 +27,11 @@ namespace EasyEyes.UI {
         }
 
         public void SpawnOnGround( string path ) {
-            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Services.ClientState.LocalPlayer.Position );
+            Plugin.SpawnVfx = new StaticVfx( Plugin, path, Services.Objects.LocalPlayer.Position );
         }
 
         public void SpawnOnSelf( string path ) {
-            Plugin.SpawnVfx = new ActorVfx( Plugin, Services.ClientState.LocalPlayer, Services.ClientState.LocalPlayer, path );
+            Plugin.SpawnVfx = new ActorVfx( Plugin, Services.Objects.LocalPlayer, Services.Objects.LocalPlayer, path );
         }
 
         public void SpawnOnTarget( string path ) {

@@ -1,11 +1,11 @@
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.1">
     <PropertyGroup>
         <AssemblyTitle>VFXEditor</AssemblyTitle>
         <Company></Company>
         <Product>EasyEyes</Product>
         <Copyright>Copyright © 2020</Copyright>
-        <FileVersion>1.3.1.1</FileVersion>
-        <AssemblyVersion>1.3.1.1</AssemblyVersion>
+        <FileVersion>1.3.1.2</FileVersion>
+        <AssemblyVersion>1.3.1.2</AssemblyVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -38,5 +38,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Penumbra.String\Penumbra.String.csproj" />
+    </ItemGroup>
+    
+ <ItemGroup>
+      <PackageReference Update="DalamudPackager" Version="14.0.1" />
     </ItemGroup>
 </Project>
