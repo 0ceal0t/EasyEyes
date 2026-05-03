@@ -6,6 +6,10 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using FFXIVClientStructs.FFXIV.Client.System.Resource;
+using InteropGenerator.Runtime;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using Dalamud.Utility;
 
 namespace EasyEyes {
     public unsafe class ResourceLoader {
@@ -13,11 +17,11 @@ namespace EasyEyes {
         private bool IsEnabled { get; set; }
         private Crc32 Crc32 { get; }
 
-        public delegate void* GetResourceSyncPrototype( IntPtr resourceManager, uint* categoryId, char* resourceType,
-            uint* resourceHash, byte* path, void* resParams );
+        public delegate void* GetResourceSyncPrototype( ResourceManager* resourceManager, ResourceCategory* category, uint* type, uint* hash, CStringPointer path,
+            void* unknown, void* unkDebugPtr, uint unkDebugInt );
 
-        public delegate void* GetResourceAsyncPrototype( IntPtr resourceManager, uint* categoryId, char* resourceType,
-            uint* resourceHash, byte* path, void* resParams, bool isUnknown );
+        public delegate void* GetResourceAsyncPrototype( ResourceManager* resourceManager, ResourceCategory* category, uint* type, uint* hash, CStringPointer path,
+            void* unknown, bool isUnknown, void* unkDebugPtr, uint unkDebugInt );
 
         // ====== FILES HOOKS ========
 
@@ -26,29 +30,28 @@ namespace EasyEyes {
         public Hook<GetResourceAsyncPrototype> GetResourceAsyncHook { get; private set; }
 
         //====== STATIC ===========
-        public delegate IntPtr StaticVfxCreateDelegate( string path, string pool );
 
-        public StaticVfxCreateDelegate StaticVfxCreate;
+        public VfxObject.Delegates.Create StaticVfxCreate;
 
-        public delegate IntPtr StaticVfxRunDelegate( IntPtr vfx, float a1, uint a2 );
+        public delegate IntPtr StaticVfxRunDelegate( VfxObject* vfx, float a1, uint a2 );
 
         public StaticVfxRunDelegate StaticVfxRun;
 
-        public delegate IntPtr StaticVfxRemoveDelegate( IntPtr vfx );
+        public delegate IntPtr StaticVfxRemoveDelegate( VfxObject* vfx );
 
         public StaticVfxRemoveDelegate StaticVfxRemove;
 
         // ======= STATIC HOOKS ========
-        public Hook<StaticVfxCreateDelegate> StaticVfxCreateHook { get; private set; }
+        public Hook<VfxObject.Delegates.Create> StaticVfxCreateHook { get; private set; }
 
         public Hook<StaticVfxRemoveDelegate> StaticVfxRemoveHook { get; private set; }
 
         // ======== ACTOR =============
-        public delegate IntPtr ActorVfxCreateDelegate( string path, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 );
+        public delegate VfxObject* ActorVfxCreateDelegate( string path, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 );
 
         public ActorVfxCreateDelegate ActorVfxCreate;
 
-        public delegate IntPtr ActorVfxRemoveDelegate( IntPtr vfx, char a2 );
+        public delegate IntPtr ActorVfxRemoveDelegate( VfxObject* vfx, char a2 );
 
         public ActorVfxRemoveDelegate ActorVfxRemove;
 
@@ -71,7 +74,7 @@ namespace EasyEyes {
             GetResourceSyncHook = Services.Hooks.HookFromAddress<GetResourceSyncPrototype>( getResourceSyncAddress, GetResourceSyncHandler );
             GetResourceAsyncHook = Services.Hooks.HookFromAddress<GetResourceAsyncPrototype>( getResourceAsyncAddress, GetResourceAsyncHandler );
 
-            var staticVfxCreateAddress = scanner.ScanText( "E8 ?? ?? ?? ?? F3 0F 10 35 ?? ?? ?? ?? 48 89 43 08" );
+            var staticVfxCreateAddress = scanner.ScanText( VfxObject.Addresses.Create.String );
             var staticVfxRunAddress = scanner.ScanText( "E8 ?? ?? ?? ?? B0 02 EB 02" );
             var staticVfxRemoveAddress = scanner.ScanText( "40 53 48 83 EC 20 48 8B D9 48 8B 89 ?? ?? ?? ?? 48 85 C9 74 28 33 D2 E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 48 85 C9" );
 
@@ -84,9 +87,9 @@ namespace EasyEyes {
 
             StaticVfxRemove = Marshal.GetDelegateForFunctionPointer<StaticVfxRemoveDelegate>( staticVfxRemoveAddress );
             StaticVfxRun = Marshal.GetDelegateForFunctionPointer<StaticVfxRunDelegate>( staticVfxRunAddress );
-            StaticVfxCreate = Marshal.GetDelegateForFunctionPointer<StaticVfxCreateDelegate>( staticVfxCreateAddress );
+            StaticVfxCreate = Marshal.GetDelegateForFunctionPointer<VfxObject.Delegates.Create>( staticVfxCreateAddress );
 
-            StaticVfxCreateHook = Services.Hooks.HookFromAddress<StaticVfxCreateDelegate>( staticVfxCreateAddress, StaticVfxNewHandler );
+            StaticVfxCreateHook = Services.Hooks.HookFromAddress<VfxObject.Delegates.Create>( staticVfxCreateAddress, StaticVfxNewHandler );
             StaticVfxRemoveHook = Services.Hooks.HookFromAddress<StaticVfxRemoveDelegate>( staticVfxRemoveAddress, StaticVfxRemoveHandler );
 
             ActorVfxCreateHook = Services.Hooks.HookFromAddress<ActorVfxCreateDelegate>( actorVfxCreateAddress, ActorVfxNewHandler );
@@ -94,27 +97,27 @@ namespace EasyEyes {
 
         }
 
-        private unsafe IntPtr StaticVfxNewHandler( string path, string pool ) {
+        private unsafe VfxObject* StaticVfxNewHandler( CStringPointer path, CStringPointer pool ) {
             var vfx = StaticVfxCreateHook.Original( path, pool );
-            Plugin.AddRecord( path );
+            Plugin.AddRecord( path.ExtractText() );
             return vfx;
         }
 
-        private unsafe IntPtr StaticVfxRemoveHandler( IntPtr vfx ) {
-            if( Plugin.SpawnVfx != null && vfx == ( IntPtr )Plugin.SpawnVfx.Vfx ) {
+        private unsafe IntPtr StaticVfxRemoveHandler( VfxObject* vfx ) {
+            if( Plugin.SpawnVfx != null && (nint)vfx == ( nint )Plugin.SpawnVfx.Vfx ) {
                 Plugin.ClearSpawnVfx();
             }
             return StaticVfxRemoveHook.Original( vfx );
         }
 
-        private unsafe IntPtr ActorVfxNewHandler( string a1, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 ) {
+        private unsafe VfxObject* ActorVfxNewHandler( string a1, IntPtr a2, IntPtr a3, float a4, char a5, ushort a6, char a7 ) {
             var vfx = ActorVfxCreateHook.Original( a1, a2, a3, a4, a5, a6, a7 );
             Plugin.AddRecord( a1 );
             return vfx;
         }
 
-        private unsafe IntPtr ActorVfxRemoveHandler( IntPtr vfx, char a2 ) {
-            if( Plugin.SpawnVfx != null && vfx == ( IntPtr )Plugin.SpawnVfx.Vfx ) {
+        private unsafe IntPtr ActorVfxRemoveHandler( VfxObject* vfx, char a2 ) {
+            if( Plugin.SpawnVfx != null && (nint) vfx == ( nint )Plugin.SpawnVfx.Vfx ) {
                 Plugin.ClearSpawnVfx();
             }
             return ActorVfxRemoveHook.Original( vfx, a2 );
@@ -167,54 +170,36 @@ namespace EasyEyes {
         }
 
         private unsafe void* GetResourceSyncHandler(
-            IntPtr pFileManager,
-            uint* pCategoryId,
-            char* pResourceType,
-            uint* pResourceHash,
-            byte* pPath,
-            void* pUnknown
-        ) => GetResourceHandler( true, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, false );
+            ResourceManager* resourceManager, ResourceCategory* category, uint* type, uint* hash, CStringPointer path,
+            void* unknown, void* unkDebugPtr, uint unkDebugInt
+        ) => GetResourceHandler( true, resourceManager, category, type, hash, path, unknown, false, unkDebugPtr, unkDebugInt );
 
         private unsafe void* GetResourceAsyncHandler(
-            IntPtr pFileManager,
-            uint* pCategoryId,
-            char* pResourceType,
-            uint* pResourceHash,
-            byte* pPath,
-            void* pUnknown,
-            bool isUnknown
-        ) => GetResourceHandler( false, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
+             ResourceManager* resourceManager, ResourceCategory* category, uint* type, uint* hash, CStringPointer path,
+            void* unknown, bool isUnknown, void* unkDebugPtr, uint unkDebugInt
+        ) => GetResourceHandler( false, resourceManager, category, type, hash, path, unknown, isUnknown, unkDebugPtr, unkDebugInt );
 
         private unsafe void* CallOriginalHandler(
             bool isSync,
-            IntPtr pFileManager,
-            uint* pCategoryId,
-            char* pResourceType,
-            uint* pResourceHash,
-            byte* pPath,
-            void* pUnknown,
-            bool isUnknown
+            ResourceManager* resourceManager, ResourceCategory* category, uint* type, uint* hash, CStringPointer path,
+            void* unknown, bool isUnknown, void* unkDebugPtr, uint unkDebugInt
         ) => isSync
-            ? GetResourceSyncHook.Original( pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown )
-            : GetResourceAsyncHook.Original( pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
+            ? GetResourceSyncHook.Original( resourceManager, category, type, hash, path, unknown, unkDebugPtr, unkDebugInt )
+            : GetResourceAsyncHook.Original( resourceManager, category, type, hash, path, unknown, isUnknown, unkDebugPtr, unkDebugInt );
 
         private unsafe void* GetResourceHandler(
-            bool isSync, IntPtr pFileManager,
-            uint* pCategoryId,
-            char* pResourceType,
-            uint* pResourceHash,
-            byte* pPath,
-            void* pUnknown,
-            bool isUnknown
+            bool isSync,
+            ResourceManager* resourceManager, ResourceCategory* category, uint* type, uint* hash, CStringPointer pPath,
+            void* unknown, bool isUnknown, void* unkDebugPtr, uint unkDebugInt
         ) {
             if( !Utf8GamePath.FromPointer( pPath, MetaDataComputation.None, out var gamePath ) ) {
-                return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
+                return CallOriginalHandler( isSync, resourceManager, category, type, hash, pPath, unknown, isUnknown, unkDebugPtr, unkDebugInt );
             }
 
             var gamePathString = gamePath.ToString();
 
             if( Plugin?.Config == null || !Plugin.Config.IsDisabled( gamePathString ) ) {
-                return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
+                return CallOriginalHandler( isSync, resourceManager, category, type, hash, pPath, unknown, isUnknown, unkDebugPtr, unkDebugInt );
             }
 
             var path = Encoding.ASCII.GetBytes( "vfx/path/nothing.avfx" );
@@ -223,8 +208,8 @@ namespace EasyEyes {
             pPath = bPath;
             Crc32.Init();
             Crc32.Update( path );
-            *pResourceHash = Crc32.Checksum;
-            return CallOriginalHandler( isSync, pFileManager, pCategoryId, pResourceType, pResourceHash, pPath, pUnknown, isUnknown );
+            *hash = Crc32.Checksum;
+            return CallOriginalHandler( isSync, resourceManager, category, type, hash, pPath, unknown, isUnknown, unkDebugPtr, unkDebugInt );
         }
     }
 }
